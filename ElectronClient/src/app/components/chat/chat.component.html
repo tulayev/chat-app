@@ -1,0 +1,8 @@
+<div style="border:1px solid gray; padding:1rem; width:300px;">
+    <div *ngFor="let m of messages" style="margin-bottom:0.5rem;">
+    <b>{{ m.user }}</b>: {{ m.text }}
+    </div>
+
+    <input [(ngModel)]="msg" placeholder="Type message" style="width:200px; margin-right:0.5rem;">
+    <button (click)="send()">Send</button>
+</div>
