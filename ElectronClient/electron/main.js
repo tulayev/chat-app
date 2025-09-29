@@ -14,7 +14,6 @@ function createWindow() {
     }
   });
 
-  // Serve Angular dist with Express
   const exp = express();
   const distPath = path.join(__dirname, '../dist/ElectronClient/browser');
   exp.use(express.static(distPath));
