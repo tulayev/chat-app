@@ -5,7 +5,13 @@ using System.Net;
 
 namespace Core.Services.Image
 {
-    public record CloudinarySettings(string CloudName, string ApiKey, string ApiSecret, string? Folder);
+    public class CloudinarySettings
+    {
+        public string CloudName { get; set; } = default!;
+        public string ApiKey { get; set; } = default!;
+        public string ApiSecret { get; set; } = default!;
+        public string? Folder { get; set; }
+    }
 
     public class ImageStoreService : IImageStoreService
     {

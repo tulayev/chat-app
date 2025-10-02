@@ -3,7 +3,6 @@ using Core.Data.Repositories.User;
 using Core.Models;
 using Core.Services.Image;
 using Core.Services.JwtToken;
-using Core.Validators.Auth;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;

@@ -7,7 +7,13 @@ using System.Text;
 
 namespace Core.Services.JwtToken
 {
-    public record JwtSettings(string Issuer, string Audience, string Key, int ExpiringHours = 2);
+    public class JwtSettings
+    {
+        public string Issuer { get; set; } = default!;
+        public string Audience { get; set; } = default!;
+        public string Key { get; set; } = default!;
+        public int ExpiringHours { get; set; } = 2;
+    }
 
     public class JwtTokenService : IJwtTokenService
     {
