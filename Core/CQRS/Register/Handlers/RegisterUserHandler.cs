@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Core.CQRS.Register.Handlers
 {
-    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, AuthResponse>
+    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, AuthResponseDto>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
@@ -28,7 +28,7 @@ namespace Core.CQRS.Register.Handlers
             _userRepository = userRepository;
         }
 
-        public async Task<AuthResponse> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
+        public async Task<AuthResponseDto> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var request = command.RegisterRequestDto;
 
@@ -66,7 +66,7 @@ namespace Core.CQRS.Register.Handlers
 
             var token = _jwtTokenService.CreateToken(user);
 
-            return new AuthResponse(token, user.UserName!, user.Email!, user.AvatarUrl);
+            return new AuthResponseDto(token, user.UserName!, user.Email!, user.AvatarUrl);
         }
     }
 }

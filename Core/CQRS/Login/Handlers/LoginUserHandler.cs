@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Core.CQRS.Login.Handlers
 {
-    public class LoginUserHandler : IRequestHandler<LoginUserQuery, AuthResponse>
+    public class LoginUserHandler : IRequestHandler<LoginUserQuery, AuthResponseDto>
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IUserRepository _userRepository;
@@ -24,7 +24,7 @@ namespace Core.CQRS.Login.Handlers
             _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<AuthResponse> Handle(LoginUserQuery query, CancellationToken cancellationToken)
+        public async Task<AuthResponseDto> Handle(LoginUserQuery query, CancellationToken cancellationToken)
         {
             var request = query.LoginRequestDto;
 
@@ -40,7 +40,7 @@ namespace Core.CQRS.Login.Handlers
 
             var token = _jwtTokenService.CreateToken(user);
 
-            return new AuthResponse(token, user.UserName!, user.Email!, user.AvatarUrl);
+            return new AuthResponseDto(token, user.UserName!, user.Email!, user.AvatarUrl);
         }
     }
 }

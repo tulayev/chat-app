@@ -19,13 +19,13 @@ namespace ServerAPI.Controllers
 
         [HttpPost("register")]
         [Consumes("multipart/form-data")]
-        public async Task<ActionResult<AuthResponse>> Register([FromForm] RegisterRequestDto request)
+        public async Task<ActionResult<AuthResponseDto>> Register([FromForm] RegisterRequestDto request)
         {
             return Ok(await _mediator.Send(new RegisterUserCommand(request)));
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequestDto request)
+        public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginRequestDto request)
         {
             return Ok(await _mediator.Send(new LoginUserQuery(request)));
         }
