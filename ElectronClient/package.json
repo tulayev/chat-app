@@ -4,11 +4,15 @@
   "main": "electron/main.js",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "npm run start:dev",
+    "build": "npm run build:dev",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "electron": "ng build && electron ."
+    "electron": "ng build && electron .",
+    "start:dev": "ng serve --c=development -o",
+    "build:dev": "ng build --c=development",
+    "start:prod": "ng serve --c=production",
+    "build:prod": "ng build --c=production"
   },
   "prettier": {
     "printWidth": 100,
