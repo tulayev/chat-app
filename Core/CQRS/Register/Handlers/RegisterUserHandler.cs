@@ -32,7 +32,7 @@ namespace Core.CQRS.Register.Handlers
         {
             var request = command.RegisterRequestDto;
 
-            if (await _userRepository.IsUserNameTakenAsync(request.UserName))
+            if (await _userRepository.IsUserNameTakenAsync(request.Username))
             {
                 throw new InvalidOperationException("UserName is already taken.");
             }
@@ -44,7 +44,7 @@ namespace Core.CQRS.Register.Handlers
 
             var user = new AppUser
             {
-                UserName = request.UserName,
+                UserName = request.Username,
                 Email = request.Email
             };
 

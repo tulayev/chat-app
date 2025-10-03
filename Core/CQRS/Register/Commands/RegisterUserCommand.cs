@@ -3,5 +3,5 @@ using MediatR;
 
 namespace Core.CQRS.Register.Commands
 {
-    public record RegisterUserCommand(RegisterWithAvatarRequestDto RegisterRequestDto) : IRequest<AuthResponse>;
+    public record RegisterUserCommand(RegisterRequestDto RegisterRequestDto) : IRequest<AuthResponse>;
 }

@@ -7,7 +7,7 @@ namespace Core.Validators.Auth
     {
         public LoginUserValidator()
         {
-            RuleFor(x => x.UserNameOrEmail).NotEmpty();
+            RuleFor(x => x.UsernameOrEmail).NotEmpty();
             RuleFor(x => x.Password).NotEmpty();
         }
     }

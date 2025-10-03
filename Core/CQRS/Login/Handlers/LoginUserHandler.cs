@@ -28,7 +28,7 @@ namespace Core.CQRS.Login.Handlers
         {
             var request = query.LoginRequestDto;
 
-            var user = await _userRepository.FindByNameOrEmailAsync(request.UserNameOrEmail)
+            var user = await _userRepository.FindByNameOrEmailAsync(request.UsernameOrEmail)
                 ?? throw new InvalidOperationException("User is not found.");
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);

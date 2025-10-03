@@ -3,11 +3,11 @@ using FluentValidation;
 
 namespace Core.Validators.Auth
 {
-    public class RegisterUserValidator : AbstractValidator<RegisterWithAvatarRequestDto>
+    public class RegisterUserValidator : AbstractValidator<RegisterRequestDto>
     {
         public RegisterUserValidator()
         {
-            RuleFor(x => x.UserName).NotEmpty().MinimumLength(3);
+            RuleFor(x => x.Username).NotEmpty().MinimumLength(3);
             RuleFor(x => x.Email).NotEmpty().EmailAddress();
             RuleFor(x => x.Password).NotEmpty().MinimumLength(6);
             When(x => x.Avatar != null, () =>

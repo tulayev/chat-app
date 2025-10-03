@@ -1,4 +1,4 @@
 ﻿namespace Core.Models.DTOs.Auth
 {
-    public record LoginRequestDto(string UserNameOrEmail, string Password);
+    public record LoginRequestDto(string UsernameOrEmail, string Password);
 }

@@ -19,7 +19,7 @@ namespace ServerAPI.Controllers
 
         [HttpPost("register")]
         [Consumes("multipart/form-data")]
-        public async Task<ActionResult<AuthResponse>> Register([FromForm] RegisterWithAvatarRequestDto request)
+        public async Task<ActionResult<AuthResponse>> Register([FromForm] RegisterRequestDto request)
         {
             return Ok(await _mediator.Send(new RegisterUserCommand(request)));
         }
