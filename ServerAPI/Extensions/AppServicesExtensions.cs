@@ -1,10 +1,13 @@
 ﻿using Core.Data;
 using Core.Data.Repositories.Message;
 using Core.Data.Repositories.User;
+using Core.Mappings;
 using Core.Models;
 using Core.Services.Image;
 using Core.Services.JwtToken;
 using FluentValidation;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +59,11 @@ namespace ServerAPI.Extensions
                         }
                     };
                 });
+            // Mapster
+            var mapsterConfig = new TypeAdapterConfig();
+            mapsterConfig.Scan(typeof(UserMapping).Assembly);
+            services.AddSingleton(mapsterConfig);
+            services.AddScoped<IMapper, ServiceMapper>();
             // Cloudinary
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             // Repositories
