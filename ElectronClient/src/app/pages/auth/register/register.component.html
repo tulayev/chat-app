@@ -1,1 +1,23 @@
-<p>register.component works!</p>
+<h2>Register</h2>
+
+<form (ngSubmit)="onSubmit()">
+  <label>Email:</label>
+  <input type="email" [(ngModel)]="form.email" name="email" required>
+
+  <label>Username:</label>
+  <input type="text" [(ngModel)]="form.username" name="username" required>
+  
+  <label>Password:</label>
+  <input type="password" [(ngModel)]="form.password" name="password" required>
+
+  <label>Avatar:</label>
+  <input type="file" name="avatar" (change)="onFileSelected($event)" accept="image/*">
+  
+  <button type="submit">Register</button>
+
+  @if(error) {
+    <p class="text-red-600">{{ error }}</p>
+  }
+</form>
+
+<a routerLink="/login">Already have an account? Login</a>

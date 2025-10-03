@@ -1,1 +1,17 @@
-<p>login.component works!</p>
+<h2>Login</h2>
+
+<form (ngSubmit)="onSubmit()">
+  <label>Email:</label>
+  <input type="email" [(ngModel)]="form.usernameOrEmail" name="usernameOrEmail" required />
+  
+  <label>Password:</label>
+  <input type="password" [(ngModel)]="form.password" name="password" required />
+  
+  <button type="submit">Login</button>
+
+  @if(error) {
+    <p class="text-red-600">{{ error }}</p>
+  }
+</form>
+
+<a routerLink="/register">No account? Register</a>
