@@ -9,13 +9,9 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/auth`;
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
 
   constructor(private readonly http: HttpClient) { }
-
-  get isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
-  }
 
   get user(): User | null {
     const user = localStorage.getItem('user');
@@ -35,24 +31,22 @@ export class AuthService {
 
     return this.http.post<User>(`${this.apiUrl}/register`, formData)
       .pipe(
-        tap(res => this.setSession(res))
+        tap(response => this.setSession(response))
       );
   }
 
   login({ usernameOrEmail, password }: LoginForm): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/login`, { usernameOrEmail, password })
       .pipe(
-        tap(res => this.setSession(res))
+        tap(response => this.setSession(response))
       );
   }
 
   logout() {
-    localStorage.removeItem('token');
     localStorage.removeItem('user');
   }
 
-  private setSession(auth: User) {
-    localStorage.setItem('token', auth.token);
-    localStorage.setItem('user', JSON.stringify(auth));
+  private setSession(user: User) {
+    localStorage.setItem('user', JSON.stringify(user));
   }
 }

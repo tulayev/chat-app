@@ -6,6 +6,8 @@ namespace Core.Data
 {
     public class ChatAppDbContext : IdentityUserContext<AppUser, int>
     {
+        public DbSet<Message> Messages { get; set; }
+
         public ChatAppDbContext(DbContextOptions<ChatAppDbContext> options) : base(options) { }
     }
 }

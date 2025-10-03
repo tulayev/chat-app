@@ -1,12 +1,27 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Core.CQRS.Message.Commands;
+using MediatR;
+using Microsoft.AspNetCore.SignalR;
+using ServerAPI.Extensions;
 
 namespace ServerAPI.Hubs
 {
     public class ChatHub : Hub
     {
-        public async Task SendMessage(string user, string message)
+        private readonly IMediator _mediator;
+
+        public ChatHub(IMediator mediator)
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            _mediator = mediator;
+        }
+
+        public async Task SendPrivateMessage(int toUserId, string message)
+        {
+            var senderId = Context.User!.GetUserId();
+
+            var result = await _mediator.Send(new SendMessageCommand(senderId!, toUserId, message));
+
+            await Clients.User(toUserId.ToString()).SendAsync("ReceiveMessage", result.SenderId, result.Content, result.SentAt);
+            await Clients.User(senderId.ToString()).SendAsync("ReceiveMessage", result.SenderId, result.Content, result.SentAt);
         }
     }
 }

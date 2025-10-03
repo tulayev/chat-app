@@ -1,4 +1,5 @@
 ﻿using Core.Data;
+using Core.Data.Repositories.Message;
 using Core.Data.Repositories.User;
 using Core.Models;
 using Core.Services.Image;
@@ -25,28 +26,40 @@ namespace ServerAPI.Extensions
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 6;
             })
-                .AddEntityFrameworkStores<ChatAppDbContext>()
-                .AddSignInManager();
+                .AddSignInManager()
+                .AddEntityFrameworkStores<ChatAppDbContext>();
             //JWT
-            services.Configure<JwtSettings>(config.GetSection("Jwt"));
-            var jwt = config.GetSection("Jwt").Get<JwtSettings>()!;
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidIssuer = jwt.Issuer,
-                        ValidAudience = jwt.Audience,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)),
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtTokenKey"]!)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+
+                            if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/hubs"))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
                     };
                 });
             // Cloudinary
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             // Repositories
+            services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             // CQRS
             services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(AppUser).Assembly));
@@ -61,13 +74,10 @@ namespace ServerAPI.Extensions
                 options.AddPolicy("Cors",
                     policy =>
                     {
-                        policy.WithOrigins(
-                            "http://localhost:4200",
-                            "http://localhost:4201"
-                        )
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
+                        policy.WithOrigins("http://localhost:4200")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
                     });
             });
 
