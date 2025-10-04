@@ -1,5 +1,6 @@
 ﻿using Core.CQRS.Register.Commands;
 using Core.Data.Repositories.User;
+using Core.Helpers;
 using Core.Models;
 using Core.Models.DTOs.Auth;
 using Core.Services.Image;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Core.CQRS.Register.Handlers
 {
-    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, AuthResponseDto>
+    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, ApiResponse<AuthResponseDto>>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
@@ -28,18 +29,18 @@ namespace Core.CQRS.Register.Handlers
             _userRepository = userRepository;
         }
 
-        public async Task<AuthResponseDto> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
+        public async Task<ApiResponse<AuthResponseDto>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var request = command.RegisterRequestDto;
 
             if (await _userRepository.IsUserNameTakenAsync(request.Username))
             {
-                throw new InvalidOperationException("UserName is already taken.");
+                return ApiResponse<AuthResponseDto>.Fail("UserName is already taken.");
             }
 
             if (await _userRepository.IsEmailTakenAsync(request.Email))
             {
-                throw new InvalidOperationException("Email is already in use.");
+                return ApiResponse<AuthResponseDto>.Fail("Email is already in use.");
             }
 
             var user = new AppUser
@@ -61,12 +62,13 @@ namespace Core.CQRS.Register.Handlers
             if (!result.Succeeded)
             {
                 var error = string.Join("; ", result.Errors.Select(e => e.Description));
-                throw new InvalidOperationException($"Registration failed: {error}");
+                return ApiResponse<AuthResponseDto>.Fail($"Registration failed: {error}");
             }
 
             var token = _jwtTokenService.CreateToken(user);
 
-            return new AuthResponseDto(token, user.UserName!, user.Email!, user.AvatarUrl);
+            var response = new AuthResponseDto(token, user.UserName!, user.Email!, user.AvatarUrl);
+            return ApiResponse<AuthResponseDto>.Ok(response);
         }
     }
 }

@@ -6,9 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ServerAPI.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseApiController
     {
         private readonly IMediator _mediator;
 
@@ -21,13 +19,15 @@ namespace ServerAPI.Controllers
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<AuthResponseDto>> Register([FromForm] RegisterRequestDto request)
         {
-            return Ok(await _mediator.Send(new RegisterUserCommand(request)));
+            var response = await _mediator.Send(new RegisterUserCommand(request));
+            return HandleResponse(response);
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginRequestDto request)
         {
-            return Ok(await _mediator.Send(new LoginUserQuery(request)));
+            var response = await _mediator.Send(new LoginUserQuery(request));
+            return HandleResponse(response);
         }
     }
 }

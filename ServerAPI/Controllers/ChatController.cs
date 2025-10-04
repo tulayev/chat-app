@@ -7,9 +7,7 @@ using ServerAPI.Extensions;
 namespace ServerAPI.Controllers
 {
     [Authorize]
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ChatController : ControllerBase
+    public class ChatController : BaseApiController
     {
         private readonly IMediator _mediator;
 
@@ -22,8 +20,9 @@ namespace ServerAPI.Controllers
         public async Task<IActionResult> GetHistory(int withUserId)
         {
             var currentUserId = User.GetUserId();
+            var response = await _mediator.Send(new ChatHistoryQuery(currentUserId!, withUserId));
 
-            return Ok(await _mediator.Send(new ChatHistoryQuery(currentUserId!, withUserId)));
+            return HandleResponse(response);
         }
     }
 }

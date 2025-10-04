@@ -1,14 +1,17 @@
-﻿using Core.Models.DTOs.Auth;
+﻿using Core.CQRS.Login.Queries;
 using FluentValidation;
 
 namespace Core.Validators.Auth
 {
-    public class LoginUserValidator : AbstractValidator<LoginRequestDto>
+    public class LoginUserValidator : AbstractValidator<LoginUserQuery>
     {
         public LoginUserValidator()
         {
-            RuleFor(x => x.UsernameOrEmail).NotEmpty();
-            RuleFor(x => x.Password).NotEmpty();
+            RuleFor(x => x.LoginRequestDto.UsernameOrEmail)
+                .NotEmpty();
+
+            RuleFor(x => x.LoginRequestDto.Password)
+                .NotEmpty();
         }
     }
 }

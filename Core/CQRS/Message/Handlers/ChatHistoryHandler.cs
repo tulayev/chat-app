@@ -1,10 +1,11 @@
 ﻿using Core.CQRS.Message.Queries;
 using Core.Data.Repositories.Message;
+using Core.Helpers;
 using MediatR;
 
 namespace Core.CQRS.Message.Handlers
 {
-    public class ChatHistoryHandler : IRequestHandler<ChatHistoryQuery, IEnumerable<Models.Message>>
+    public class ChatHistoryHandler : IRequestHandler<ChatHistoryQuery, ApiResponse<IEnumerable<Models.Message>>>
     {
         private readonly IMessageRepository _messageRepository;
 
@@ -13,9 +14,10 @@ namespace Core.CQRS.Message.Handlers
             _messageRepository = messageRepository;
         }
 
-        public async Task<IEnumerable<Models.Message>> Handle(ChatHistoryQuery query, CancellationToken cancellationToken)
+        public async Task<ApiResponse<IEnumerable<Models.Message>>> Handle(ChatHistoryQuery query, CancellationToken cancellationToken)
         {
-            return await _messageRepository.GetHistoryAsync(query.UserId, query.WithUserId);
+            var result = await _messageRepository.GetHistoryAsync(query.UserId, query.WithUserId);
+            return ApiResponse<IEnumerable<Models.Message>>.Ok(result);
         }
     }
 }

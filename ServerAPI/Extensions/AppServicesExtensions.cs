@@ -1,13 +1,16 @@
-﻿using Core.Data;
+﻿using Core.Behaviors;
+using Core.Data;
 using Core.Data.Repositories.Message;
 using Core.Data.Repositories.User;
 using Core.Mappings;
 using Core.Models;
 using Core.Services.Image;
 using Core.Services.JwtToken;
+using Core.Validators.Auth;
 using FluentValidation;
 using Mapster;
 using MapsterMapper;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -72,10 +75,12 @@ namespace ServerAPI.Extensions
             // CQRS
             services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(AppUser).Assembly));
             // FluentValidation
-            services.AddValidatorsFromAssembly(typeof(AppUser).Assembly);
+            services.AddValidatorsFromAssembly(typeof(RegisterUserValidator).Assembly);
             // Custom Services
             services.AddScoped<IImageStoreService, ImageStoreService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
+            // Validation Pipeline
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             // CORS
             services.AddCors(options =>
             {

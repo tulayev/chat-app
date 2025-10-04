@@ -1,6 +1,7 @@
 using NLog;
 using ServerAPI.Extensions;
 using ServerAPI.Hubs;
+using ServerAPI.Middlewares;
 
 try 
 {
@@ -15,6 +16,7 @@ try
 
     var app = builder.Build();
 
+    app.UseMiddleware<ExceptionMiddleware>();
     app.UseCors("Cors");
     app.UseAuthentication();
     app.UseAuthorization();
