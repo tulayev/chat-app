@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.CQRS.Message.Handlers
 {
-    public class SendMessageHandler : IRequestHandler<SendMessageCommand, MessageDto>
+    public class SendMessageHandler : IRequestHandler<SendMessageCommand, SendMessageDto>
     {
         private readonly IMessageRepository _messageRepository;
 
@@ -14,7 +14,7 @@ namespace Core.CQRS.Message.Handlers
             _messageRepository = messageRepository;
         }
 
-        public async Task<MessageDto> Handle(SendMessageCommand command, CancellationToken cancellationToken)
+        public async Task<SendMessageDto> Handle(SendMessageCommand command, CancellationToken cancellationToken)
         {
             var message = new Models.Message
             {
@@ -24,7 +24,7 @@ namespace Core.CQRS.Message.Handlers
             };
 
             await _messageRepository.AddAsync(message);
-            return new MessageDto(message.Id, message.SenderId, message.ReceiverId, message.Content, message.SentAt);
+            return new SendMessageDto(message.Id, message.SenderId, message.ReceiverId, message.Content, message.SentAt);
         }
     }
 }

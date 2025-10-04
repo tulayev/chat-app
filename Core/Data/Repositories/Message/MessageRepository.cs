@@ -20,10 +20,11 @@ namespace Core.Data.Repositories.Message
         public async Task<IEnumerable<Models.Message>> GetHistoryAsync(int userId, int withUserId)
         {
             return await _db.Messages
-                .Where(m =>
-                    (m.SenderId == userId && m.ReceiverId == withUserId) ||
-                    (m.SenderId == withUserId && m.ReceiverId == userId))
-                .OrderBy(m => m.SentAt)
+                .Include(x => x.Sender)
+                .Include(x => x.Receiver)
+                .Where(x =>
+                    (x.SenderId == userId && x.ReceiverId == withUserId) ||
+                    (x.SenderId == withUserId && x.ReceiverId == userId))
                 .ToListAsync();
         }
     }
