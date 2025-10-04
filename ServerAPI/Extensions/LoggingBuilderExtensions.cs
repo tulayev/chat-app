@@ -23,16 +23,22 @@ namespace ServerAPI.Extensions
             var logfile = new FileTarget("logfile")
             {
                 FileName = Path.Combine(logDir, "${shortdate}.log"),
-                Layout = "${longdate} | ${level:uppercase=true} | ${logger} | ${message} ${exception}"
-            };
-
-            var logconsole = new ConsoleTarget("logconsole")
-            {
-                Layout = "${longdate} | ${level:uppercase=true} | ${logger} | ${message} ${exception}"
+                Layout = "${date:format=yyyy-MM-dd HH\\:mm\\:ss} | ${level:uppercase=true} | ${logger} | ${message} ${exception}"
             };
 
             logConfig.AddRule(NLog.LogLevel.Info, NLog.LogLevel.Fatal, logfile);
-            logConfig.AddRule(NLog.LogLevel.Debug, NLog.LogLevel.Fatal, logconsole);
+            
+            var logconsole = new ColoredConsoleTarget("logconsole")
+            {
+                Layout = "${date:format=yyyy-MM-dd HH\\:mm\\:ss} | ${level:uppercase=true} | ${logger} | ${message} ${exception}"
+            };
+
+            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("INFO", ConsoleOutputColor.Green, ConsoleOutputColor.NoChange));
+            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("WARN", ConsoleOutputColor.Yellow, ConsoleOutputColor.NoChange));
+            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("ERROR", ConsoleOutputColor.Red, ConsoleOutputColor.NoChange));
+            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("FATAL", ConsoleOutputColor.DarkRed, ConsoleOutputColor.NoChange));
+
+            logConfig.AddRule(NLog.LogLevel.Info, NLog.LogLevel.Fatal, logconsole);
 
             LogManager.Configuration = logConfig;
 
