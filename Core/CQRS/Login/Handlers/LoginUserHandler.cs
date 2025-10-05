@@ -1,5 +1,5 @@
 ﻿using Core.CQRS.Login.Queries;
-using Core.Data.Repositories.User;
+using Core.Data.Repositories;
 using Core.Helpers;
 using Core.Models;
 using Core.Models.DTOs.Auth;
@@ -12,16 +12,16 @@ namespace Core.CQRS.Login.Handlers
     public class LoginUserHandler : IRequestHandler<LoginUserQuery, ApiResponse<AuthResponseDto>>
     {
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IJwtTokenService _jwtTokenService;
 
         public LoginUserHandler(
             SignInManager<AppUser> signInManager, 
-            IUserRepository userRepository, 
+            IUnitOfWork unitOfWork, 
             IJwtTokenService jwtTokenService)
         {
             _signInManager = signInManager;
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
             _jwtTokenService = jwtTokenService;
         }
 
@@ -29,7 +29,7 @@ namespace Core.CQRS.Login.Handlers
         {
             var request = query.LoginRequestDto;
 
-            var user = await _userRepository.FindByNameOrEmailAsync(request.UsernameOrEmail);
+            var user = await _unitOfWork.Users.FindByNameOrEmailAsync(request.UsernameOrEmail);
 
             if (user == null)
             {

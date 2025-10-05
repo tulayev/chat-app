@@ -1,7 +1,6 @@
 ﻿using Core.Behaviors;
 using Core.Data;
-using Core.Data.Repositories.Message;
-using Core.Data.Repositories.User;
+using Core.Data.Repositories;
 using Core.Mappings;
 using Core.Models;
 using Core.Services.Image;
@@ -70,8 +69,7 @@ namespace ServerAPI.Extensions
             // Cloudinary
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             // Repositories
-            services.AddScoped<IMessageRepository, MessageRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             // CQRS
             services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(AppUser).Assembly));
             // FluentValidation

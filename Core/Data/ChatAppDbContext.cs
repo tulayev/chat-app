@@ -1,4 +1,5 @@
 ﻿using Core.Models;
+using Core.Models.Abstractions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,5 +10,34 @@ namespace Core.Data
         public DbSet<Message> Messages { get; set; }
 
         public ChatAppDbContext(DbContextOptions<ChatAppDbContext> options) : base(options) { }
+
+        public override int SaveChanges()
+        {
+            UpdateTimestamps();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            UpdateTimestamps();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void UpdateTimestamps()
+        {
+            var entries = ChangeTracker
+                .Entries<IAuditableEntity>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedAt = DateTimeOffset.Now;
+                }
+
+                entry.Entity.UpdatedAt = DateTimeOffset.Now;
+            }
+        }
     }
 }

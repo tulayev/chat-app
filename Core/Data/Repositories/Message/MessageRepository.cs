@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Core.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Data.Repositories.Message
 {
@@ -13,8 +14,7 @@ namespace Core.Data.Repositories.Message
 
         public async Task AddAsync(Models.Message message)
         {
-            _db.Messages.Add(message);
-            await _db.SaveChangesAsync();
+            await _db.Messages.AddAsync(message);
         }
 
         public async Task<IEnumerable<Models.Message>> GetHistoryAsync(int userId, int withUserId)
@@ -22,9 +22,7 @@ namespace Core.Data.Repositories.Message
             return await _db.Messages
                 .Include(x => x.Sender)
                 .Include(x => x.Receiver)
-                .Where(x =>
-                    (x.SenderId == userId && x.ReceiverId == withUserId) ||
-                    (x.SenderId == withUserId && x.ReceiverId == userId))
+                .Where(MessageExtensions.BetweenUsersPredicate(userId, withUserId))
                 .ToListAsync();
         }
     }

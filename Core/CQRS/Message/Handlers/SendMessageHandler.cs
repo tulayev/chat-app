@@ -1,5 +1,5 @@
 ﻿using Core.CQRS.Message.Commands;
-using Core.Data.Repositories.Message;
+using Core.Data.Repositories;
 using Core.Models.DTOs.Message;
 using MediatR;
 
@@ -7,11 +7,11 @@ namespace Core.CQRS.Message.Handlers
 {
     public class SendMessageHandler : IRequestHandler<SendMessageCommand, SendMessageDto>
     {
-        private readonly IMessageRepository _messageRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public SendMessageHandler(IMessageRepository messageRepository)
+        public SendMessageHandler(IUnitOfWork unitOfWork)
         {
-            _messageRepository = messageRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<SendMessageDto> Handle(SendMessageCommand command, CancellationToken cancellationToken)
@@ -23,7 +23,8 @@ namespace Core.CQRS.Message.Handlers
                 Content = command.Content,
             };
 
-            await _messageRepository.AddAsync(message);
+            await _unitOfWork.Messages.AddAsync(message);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             return new SendMessageDto(message.Id, message.SenderId, message.ReceiverId, message.Content, message.SentAt);
         }
     }

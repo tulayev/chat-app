@@ -2,5 +2,5 @@
 
 namespace Core.Models.DTOs.Message
 {
-    public record MessageDto(int Id, string Content, DateTime SentTime, UserDto From, UserDto To);
+    public record MessageDto(int Id, string Content, DateTime SentAt, UserDto From, UserDto To);
 }
