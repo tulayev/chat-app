@@ -1,5 +1,5 @@
 ﻿using Core.CQRS.Register.Commands;
-using Core.Data.Repositories.User;
+using Core.Data.Repositories;
 using Core.Helpers;
 using Core.Models;
 using Core.Models.DTOs.Auth;
@@ -15,30 +15,30 @@ namespace Core.CQRS.Register.Handlers
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IImageStoreService _imageStoreService;
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public RegisterUserHandler(
             UserManager<AppUser> userManager,
             IJwtTokenService jwtTokenService,
             IImageStoreService imageStoreService,
-            IUserRepository userRepository)
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
             _imageStoreService = imageStoreService;
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<ApiResponse<AuthResponseDto>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var request = command.RegisterRequestDto;
 
-            if (await _userRepository.IsUserNameTakenAsync(request.Username))
+            if (await _unitOfWork.Users.IsUserNameTakenAsync(request.Username))
             {
                 return ApiResponse<AuthResponseDto>.Fail("UserName is already taken.");
             }
 
-            if (await _userRepository.IsEmailTakenAsync(request.Email))
+            if (await _unitOfWork.Users.IsEmailTakenAsync(request.Email))
             {
                 return ApiResponse<AuthResponseDto>.Fail("Email is already in use.");
             }
