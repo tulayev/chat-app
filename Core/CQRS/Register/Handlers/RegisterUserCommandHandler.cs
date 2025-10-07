@@ -1,5 +1,4 @@
 ﻿using Core.CQRS.Register.Commands;
-using Core.Data.Repositories;
 using Core.Helpers;
 using Core.Models;
 using Core.Models.DTOs.Auth;
@@ -7,38 +6,36 @@ using Core.Services.Image;
 using Core.Services.JwtToken;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.CQRS.Register.Handlers
 {
-    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, ApiResponse<AuthResponseDto>>
+    public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, ApiResponse<AuthResponseDto>>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IImageStoreService _imageStoreService;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public RegisterUserHandler(
+        public RegisterUserCommandHandler(
             UserManager<AppUser> userManager,
             IJwtTokenService jwtTokenService,
-            IImageStoreService imageStoreService,
-            IUnitOfWork unitOfWork)
+            IImageStoreService imageStoreService)
         {
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
             _imageStoreService = imageStoreService;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<ApiResponse<AuthResponseDto>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var request = command.RegisterRequestDto;
 
-            if (await _unitOfWork.Users.IsUserNameTakenAsync(request.Username))
+            if (await _userManager.Users.AnyAsync(x => x.UserName == request.Username))
             {
                 return ApiResponse<AuthResponseDto>.Fail("UserName is already taken.");
             }
 
-            if (await _unitOfWork.Users.IsEmailTakenAsync(request.Email))
+            if (await _userManager.Users.AnyAsync(x => x.Email == request.Email))
             {
                 return ApiResponse<AuthResponseDto>.Fail("Email is already in use.");
             }

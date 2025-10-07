@@ -1,4 +1,4 @@
-﻿using Core.CQRS.Message.Queries;
+﻿using Core.CQRS.Messages.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +16,20 @@ namespace ServerAPI.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("history/{withUserId}")]
-        public async Task<IActionResult> GetHistory(int withUserId)
+        [HttpGet("contacts")]
+        public async Task<IActionResult> GetChatContacts()
         {
             var currentUserId = User.GetUserId();
-            var response = await _mediator.Send(new ChatHistoryQuery(currentUserId!, withUserId));
+            var response = await _mediator.Send(new GetChatContactsQuery(currentUserId));
+
+            return HandleResponse(response);
+        }
+
+        [HttpGet("history/{withUserId}")]
+        public async Task<IActionResult> GetChatHistory(int withUserId)
+        {
+            var currentUserId = User.GetUserId();
+            var response = await _mediator.Send(new GetChatHistoryQuery(currentUserId!, withUserId));
 
             return HandleResponse(response);
         }

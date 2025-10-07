@@ -6,16 +6,17 @@ using Core.Models.DTOs.Auth;
 using Core.Services.JwtToken;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.CQRS.Login.Handlers
 {
-    public class LoginUserHandler : IRequestHandler<LoginUserQuery, ApiResponse<AuthResponseDto>>
+    public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ApiResponse<AuthResponseDto>>
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IJwtTokenService _jwtTokenService;
 
-        public LoginUserHandler(
+        public LoginUserQueryHandler(
             SignInManager<AppUser> signInManager, 
             IUnitOfWork unitOfWork, 
             IJwtTokenService jwtTokenService)
@@ -29,7 +30,8 @@ namespace Core.CQRS.Login.Handlers
         {
             var request = query.LoginRequestDto;
 
-            var user = await _unitOfWork.Users.FindByNameOrEmailAsync(request.UsernameOrEmail);
+            var user = await _unitOfWork.GetQueryable<AppUser>()
+                .FirstOrDefaultAsync(x => x.Email == request.UsernameOrEmail || x.UserName == request.UsernameOrEmail);
 
             if (user == null)
             {

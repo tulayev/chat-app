@@ -1,4 +1,4 @@
-﻿using Core.CQRS.Message.Commands;
+﻿using Core.CQRS.Messages.Commands;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using ServerAPI.Extensions;

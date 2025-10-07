@@ -27,7 +27,7 @@ namespace Core.Data
         {
             var entries = ChangeTracker
                 .Entries<IAuditableEntity>()
-                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+                .Where(e => e is IAuditableEntity && (e.State == EntityState.Added || e.State == EntityState.Modified));
 
             foreach (var entry in entries)
             {

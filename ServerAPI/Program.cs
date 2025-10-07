@@ -14,7 +14,7 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddAppServices(builder.Configuration);
 
-    var app = builder.Build();
+    var app = await builder.Build().MigrateDatabaseAsync();
 
     app.UseMiddleware<ExceptionMiddleware>();
     app.UseCors("Cors");
