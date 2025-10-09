@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Application.CQRS.Messages.Handlers
 {
-    public class GetChatHistoryQueryHandler : IRequestHandler<GetChatHistoryQuery, ApiResponse<IEnumerable<MessageDto>>>
+    public class GetChatHistoryQueryHandler : IRequestHandler<GetChatHistoryQuery, ApiResponse<IEnumerable<ChatHistoryDto>>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -20,7 +20,7 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
             _mapper = mapper;
         }
 
-        public async Task<ApiResponse<IEnumerable<MessageDto>>> Handle(GetChatHistoryQuery query, CancellationToken cancellationToken)
+        public async Task<ApiResponse<IEnumerable<ChatHistoryDto>>> Handle(GetChatHistoryQuery query, CancellationToken cancellationToken)
         {
             var result = await _unitOfWork.GetQueryable<Message>()
                 .Include(x => x.Sender)
@@ -30,9 +30,9 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
                     (x.SenderId == query.WithUserId && x.ReceiverId == query.UserId))
                 .ToListAsync(cancellationToken);
 
-            var mapped = _mapper.From(result).AdaptToType<IEnumerable<MessageDto>>();
+            var mapped = _mapper.From(result).AdaptToType<IEnumerable<ChatHistoryDto>>();
 
-            return ApiResponse<IEnumerable<MessageDto>>.Ok(mapped);
+            return ApiResponse<IEnumerable<ChatHistoryDto>>.Ok(mapped);
         }
     }
 }

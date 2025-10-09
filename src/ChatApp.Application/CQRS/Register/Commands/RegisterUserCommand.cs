@@ -4,5 +4,5 @@ using MediatR;
 
 namespace ChatApp.Application.CQRS.Register.Commands
 {
-    public record RegisterUserCommand(RegisterRequestDto RegisterRequestDto) : IRequest<ApiResponse<AuthResponseDto>>;
+    public record RegisterUserCommand(RegisterRequestDto RegisterRequestDto) : IRequest<ApiResponse<AuthUserDto>>;
 }

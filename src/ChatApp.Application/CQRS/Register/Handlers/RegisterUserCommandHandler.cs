@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Application.CQRS.Register.Handlers
 {
-    public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, ApiResponse<AuthResponseDto>>
+    public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, ApiResponse<AuthUserDto>>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
@@ -26,18 +26,18 @@ namespace ChatApp.Application.CQRS.Register.Handlers
             _imageStoreService = imageStoreService;
         }
 
-        public async Task<ApiResponse<AuthResponseDto>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
+        public async Task<ApiResponse<AuthUserDto>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var request = command.RegisterRequestDto;
 
             if (await _userManager.Users.AnyAsync(x => x.UserName == request.Username))
             {
-                return ApiResponse<AuthResponseDto>.Fail("UserName is already taken.");
+                return ApiResponse<AuthUserDto>.Fail("UserName is already taken.");
             }
 
             if (await _userManager.Users.AnyAsync(x => x.Email == request.Email))
             {
-                return ApiResponse<AuthResponseDto>.Fail("Email is already in use.");
+                return ApiResponse<AuthUserDto>.Fail("Email is already in use.");
             }
 
             var user = new AppUser
@@ -59,13 +59,13 @@ namespace ChatApp.Application.CQRS.Register.Handlers
             if (!result.Succeeded)
             {
                 var error = string.Join("; ", result.Errors.Select(e => e.Description));
-                return ApiResponse<AuthResponseDto>.Fail($"Registration failed: {error}");
+                return ApiResponse<AuthUserDto>.Fail($"Registration failed: {error}");
             }
 
             var token = _jwtTokenService.CreateToken(user);
 
-            var response = new AuthResponseDto(token, user.UserName!, user.Email!, user.AvatarUrl);
-            return ApiResponse<AuthResponseDto>.Ok(response);
+            var response = new AuthUserDto(token, user.UserName!, user.Email!, user.AvatarUrl);
+            return ApiResponse<AuthUserDto>.Ok(response);
         }
     }
 }

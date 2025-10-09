@@ -14,13 +14,13 @@ namespace ChatApp.API.Hubs
             _mediator = mediator;
         }
 
-        public async Task SendPrivateMessage(int toUserId, string message)
+        public async Task SendPrivateMessage(int receiverId, string content)
         {
             var senderId = Context.User!.GetUserId();
 
-            var result = await _mediator.Send(new SendMessageCommand(senderId!, toUserId, message));
+            var result = await _mediator.Send(new SendMessageCommand(senderId!, receiverId, content));
 
-            await Clients.User(toUserId.ToString()).SendAsync("ReceiveMessage", result.SenderId, result.Content, result.SentAt);
+            await Clients.User(receiverId.ToString()).SendAsync("ReceiveMessage", result.SenderId, result.Content, result.SentAt);
             await Clients.User(senderId.ToString()).SendAsync("ReceiveMessage", result.SenderId, result.Content, result.SentAt);
         }
     }

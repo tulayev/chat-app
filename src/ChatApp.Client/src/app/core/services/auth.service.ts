@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { User } from '@app/models';
+import { AuthUser } from '@app/models';
 import { environment } from '@environments/environment';
 import { LoginForm, RegisterForm } from '@pages/auth';
 import { Observable, tap } from 'rxjs';
@@ -13,12 +13,12 @@ export class AuthService {
 
   constructor(private readonly http: HttpClient) { }
 
-  get user(): User | null {
+  get user(): AuthUser | null {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   }
 
-  register({username, email, password, avatar}: RegisterForm): Observable<User> {
+  register({username, email, password, avatar}: RegisterForm): Observable<AuthUser> {
     const formData = new FormData();
     
     formData.append('username', username);
@@ -29,14 +29,14 @@ export class AuthService {
       formData.append('avatar', avatar);
     }
 
-    return this.http.post<User>(`${this.apiUrl}/register`, formData)
+    return this.http.post<AuthUser>(`${this.apiUrl}/register`, formData)
       .pipe(
         tap(response => this.setSession(response))
       );
   }
 
-  login({ usernameOrEmail, password }: LoginForm): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/login`, { usernameOrEmail, password })
+  login({ usernameOrEmail, password }: LoginForm): Observable<AuthUser> {
+    return this.http.post<AuthUser>(`${this.apiUrl}/login`, { usernameOrEmail, password })
       .pipe(
         tap(response => this.setSession(response))
       );
@@ -46,7 +46,7 @@ export class AuthService {
     localStorage.removeItem('user');
   }
 
-  private setSession(user: User) {
+  private setSession(user: AuthUser) {
     localStorage.setItem('user', JSON.stringify(user));
   }
 }

@@ -4,5 +4,5 @@ using MediatR;
 
 namespace ChatApp.Application.CQRS.Messages.Queries
 {
-    public record GetChatHistoryQuery(int UserId, int WithUserId) : IRequest<ApiResponse<IEnumerable<MessageDto>>>;
+    public record GetChatHistoryQuery(int UserId, int WithUserId) : IRequest<ApiResponse<IEnumerable<ChatHistoryDto>>>;
 }

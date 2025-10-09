@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ChatMessage } from '@app/models';
+import { ChatHistory } from '@app/models';
 import { ChatService } from '@core/services';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -10,19 +11,21 @@ import { ChatService } from '@core/services';
   imports: [FormsModule, CommonModule],
   templateUrl: './chat.component.html'
 })
-export class ChatComponent {
-  messages: ChatMessage[] = [];
+export class ChatComponent implements OnInit {
+  messages$!: Observable<ChatHistory[]>;
   newMessage = '';
   recepientId = 2; // TODO: dynamically choose recepient
 
   constructor(private readonly chatService: ChatService) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
+    this.messages$ = this.chatService.messages$;
+    this.chatService.loadChatHistory(this.recepientId);
+    // start signalR for real-time chat
     await this.chatService.start();
-    this.chatService.messages$.subscribe(messages => this.messages = messages);
   }
 
-  send() {
+  send(): void {
     if (!this.newMessage.trim()) {
       return;
     }

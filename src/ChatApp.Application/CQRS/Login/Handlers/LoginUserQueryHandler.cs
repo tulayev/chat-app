@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Application.CQRS.Login.Handlers
 {
-    public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ApiResponse<AuthResponseDto>>
+    public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ApiResponse<AuthUserDto>>
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IUnitOfWork _unitOfWork;
@@ -26,7 +26,7 @@ namespace ChatApp.Application.CQRS.Login.Handlers
             _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<ApiResponse<AuthResponseDto>> Handle(LoginUserQuery query, CancellationToken cancellationToken)
+        public async Task<ApiResponse<AuthUserDto>> Handle(LoginUserQuery query, CancellationToken cancellationToken)
         {
             var request = query.LoginRequestDto;
 
@@ -35,21 +35,21 @@ namespace ChatApp.Application.CQRS.Login.Handlers
 
             if (user == null)
             {
-                return ApiResponse<AuthResponseDto>.Fail("User is not found");
+                return ApiResponse<AuthUserDto>.Fail("User is not found");
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
 
             if (!result.Succeeded)
             {
-                return ApiResponse<AuthResponseDto>.Fail("Login or password is incorrect.");
+                return ApiResponse<AuthUserDto>.Fail("Login or password is incorrect.");
             }
 
             var token = _jwtTokenService.CreateToken(user);
 
-            var response = new AuthResponseDto(token, user.UserName!, user.Email!, user.AvatarUrl);
+            var response = new AuthUserDto(token, user.UserName!, user.Email!, user.AvatarUrl);
 
-            return ApiResponse<AuthResponseDto>.Ok(response);
+            return ApiResponse<AuthUserDto>.Ok(response);
         }
     }
 }

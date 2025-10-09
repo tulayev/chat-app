@@ -8,7 +8,7 @@ namespace ChatApp.Application.Mappings
     {
         public void Register(TypeAdapterConfig config)
         {
-            config.NewConfig<Message, MessageDto>()
+            config.NewConfig<Message, ChatHistoryDto>()
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Content, src => src.Content)
                 .Map(dest => dest.SentAt, src => src.SentAt)

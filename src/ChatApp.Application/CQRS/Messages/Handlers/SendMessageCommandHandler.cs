@@ -26,6 +26,7 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
 
             await _unitOfWork.AddAsync(message);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
             return new SendMessageDto(message.Id, message.SenderId, message.ReceiverId, message.Content, message.SentAt);
         }
     }
