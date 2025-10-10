@@ -13,7 +13,7 @@ export class ChatService {
   private messagesSource = new BehaviorSubject<ChatHistory[]>([]);
   messages$ = this.messagesSource.asObservable();
   private readonly chatHubUrl = `${environment.baseUrl}/hubs/chat`;
-  private readonly apiUrl = `${environment.apiUrl}/history`;
+  private readonly apiUrl = `${environment.apiUrl}`;
   private readonly hubConnection: signalR.HubConnection;
 
   constructor(
@@ -48,7 +48,7 @@ export class ChatService {
   }
 
   loadChatHistory(withUserId: number): Subscription {
-    return this.http.get<ApiResponse<ChatHistory[]>>(`${this.apiUrl}/${withUserId}`)
+    return this.http.get<ApiResponse<ChatHistory[]>>(`${this.apiUrl}/chat/history/${withUserId}`)
       .subscribe(({ data }) => {
         this.messagesSource.next(data);
       });
