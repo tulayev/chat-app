@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SQLitePCL;
 using System.Text;
 
 namespace ChatApp.Infrastructure
@@ -21,6 +22,7 @@ namespace ChatApp.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config) 
         {
             // DB (SQLite)
+            Batteries_V2.Init();
             services.AddDbContext<ChatAppDbContext>(options => options.UseSqlite(config.GetConnectionString("Default")));
             // Identity Core
             services.AddIdentityCore<AppUser>(options =>

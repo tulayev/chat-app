@@ -22,7 +22,7 @@ export class LoginComponent {
     private readonly router: Router,
     private readonly auth: AuthService) {}
 
-  onSubmit() {
+  onSubmit(): void {
     this.auth.login(this.form).subscribe({
       next: () => this.router.navigate(['/chat']),
       error: err => this.error = err.error?.message || 'Login failed'

@@ -42,11 +42,11 @@ export class AuthService {
       );
   }
 
-  logout() {
+  logout(): void {
     localStorage.removeItem('user');
   }
 
-  private setSession(user: AuthUser) {
+  private setSession(user: AuthUser): void {
     localStorage.setItem('user', JSON.stringify(user));
   }
 }

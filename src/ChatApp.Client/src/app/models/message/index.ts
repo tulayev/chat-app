@@ -3,6 +3,7 @@ import { User } from '../user';
 export interface ChatContact {
   id: number;
   username: string;
+  avatarUrl: string;
   lastMessage: string;
   lastMessageDate: Date;
 }

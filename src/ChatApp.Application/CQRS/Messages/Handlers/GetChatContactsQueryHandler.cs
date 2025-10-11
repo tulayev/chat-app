@@ -44,6 +44,7 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
                 {
                     Id = x.user.Id,
                     Username = x.user.UserName,
+                    AvatarUrl = x.user.AvatarUrl,
                     LastMessage = x.LastMessage,
                     LastMessageDate = x.LastMessageDate
                 })

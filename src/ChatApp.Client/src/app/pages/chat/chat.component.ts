@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ChatHistory } from '@app/models';
-import { ChatService } from '@core/services';
-import { Observable } from 'rxjs';
+import { AuthUser, ChatContact, ChatHistory } from '@app/models';
+import { AuthService, ChatService } from '@core/services';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -12,17 +12,19 @@ import { Observable } from 'rxjs';
   templateUrl: './chat.component.html'
 })
 export class ChatComponent implements OnInit {
+  chatContacts$!: Observable<ChatContact[]>;
   messages$!: Observable<ChatHistory[]>;
+  user!: AuthUser | null;
+  chatContactId!: number;
   newMessage = '';
-  recepientId = 2; // TODO: dynamically choose recepient
 
-  constructor(private readonly chatService: ChatService) { }
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly authService: AuthService
+  ) { }
 
   async ngOnInit(): Promise<void> {
-    this.messages$ = this.chatService.messages$;
-    this.chatService.loadChatHistory(this.recepientId);
-    // start signalR for real-time chat
-    await this.chatService.start();
+    await this.loadData();
   }
 
   send(): void {
@@ -30,7 +32,23 @@ export class ChatComponent implements OnInit {
       return;
     }
 
-    this.chatService.sendPrivateMessage(this.recepientId, this.newMessage);
+    this.chatService.sendPrivateMessage(this.chatContactId, this.newMessage);
     this.newMessage = '';
+  }
+
+  onChatContactClick(userId: number): void {
+    this.chatContactId = userId;
+    this.chatService.loadChatHistory(this.chatContactId);
+    this.messages$ = this.chatService.messages$;
+  }
+
+  private async loadData(): Promise<void> {
+    this.user = this.authService.user;
+    // contacts
+    this.chatContacts$ = this.chatService.loadChatContacts().pipe(
+      map(({ data }) => data)
+    );
+    // start signalR for real-time chat
+    await this.chatService.start();
   }
 }

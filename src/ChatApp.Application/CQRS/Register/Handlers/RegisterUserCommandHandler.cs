@@ -64,7 +64,7 @@ namespace ChatApp.Application.CQRS.Register.Handlers
 
             var token = _jwtTokenService.CreateToken(user);
 
-            var response = new AuthUserDto(token, user.UserName!, user.Email!, user.AvatarUrl);
+            var response = new AuthUserDto(user.Id, token, user.UserName!, user.Email!, user.AvatarUrl);
             return ApiResponse<AuthUserDto>.Ok(response);
         }
     }

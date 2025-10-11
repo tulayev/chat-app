@@ -12,6 +12,6 @@
   {
     "UserName": "Rob",
     "Email": "rob@chat.app",
-    "Avatar": "https://res.cloudinary.com/dsiwchhma/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1661592813/samples/animals/reindeer.jpg"
+    "AvatarUrl": "https://res.cloudinary.com/dsiwchhma/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1661592813/samples/animals/reindeer.jpg"
   }
 ]

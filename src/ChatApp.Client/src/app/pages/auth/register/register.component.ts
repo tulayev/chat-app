@@ -24,7 +24,7 @@ export class RegisterComponent {
     private readonly router: Router,
     private readonly auth: AuthService) { }
 
-  onFileSelected(event: Event) {
+  onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
 
     if (input.files && input.files.length > 0) {
@@ -32,7 +32,7 @@ export class RegisterComponent {
     }
   }
 
-  onSubmit() {
+  onSubmit(): void {
     this.auth.register(this.form).subscribe({
       next: () => this.router.navigate(['/chat']),
       error: err => this.error = err.error?.message || 'Registration failed'

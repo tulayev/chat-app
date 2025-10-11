@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiResponse, ChatHistory } from '@app/models';
+import { ApiResponse, ChatContact, ChatHistory } from '@app/models';
 import { AuthService } from '@core/services/auth.service';
 import { environment } from '@environments/environment';
 import * as signalR from '@microsoft/signalr';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +45,10 @@ export class ChatService {
 
   sendPrivateMessage(receiverId: number, content: string): void {
     this.hubConnection.invoke('SendPrivateMessage', receiverId, content);
+  }
+
+  loadChatContacts(): Observable<ApiResponse<ChatContact[]>> {
+    return this.http.get<ApiResponse<ChatContact[]>>(`${this.apiUrl}/chat/contacts`);
   }
 
   loadChatHistory(withUserId: number): Subscription {
