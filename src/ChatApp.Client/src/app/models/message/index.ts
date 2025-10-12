@@ -1,25 +1,16 @@
 import { User } from '../user';
 
-export interface ChatContact {
+export interface ChatMessage {
   id: number;
-  username: string;
-  avatarUrl: string;
-  lastMessage: string;
-  lastMessageDate: Date;
-}
-
-export interface ChatHistory {
-  id: number;
+  chatId: number;
+  sender: User;
   content: string;
   sentAt: Date;
-  from: User;
-  to: User;
 }
 
 export interface SendMessage {
   id: number;
   senderId: number;
-  receiverId: number | null;
   content: string;
   sentAt: Date;
 }

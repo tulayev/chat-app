@@ -94,10 +94,40 @@ namespace ChatApp.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("ChatApp.Domain.Models.Chat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("User1Id")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("User2Id")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("User1Id");
+
+                    b.HasIndex("User2Id");
+
+                    b.ToTable("Chats");
+                });
+
             modelBuilder.Entity("ChatApp.Domain.Models.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ChatId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Content")
@@ -106,9 +136,6 @@ namespace ChatApp.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("TEXT");
-
-                    b.Property<int?>("ReceiverId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<int>("SenderId")
                         .HasColumnType("INTEGER");
@@ -121,7 +148,7 @@ namespace ChatApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReceiverId");
+                    b.HasIndex("ChatId");
 
                     b.HasIndex("SenderId");
 
@@ -190,11 +217,32 @@ namespace ChatApp.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ChatApp.Domain.Models.Chat", b =>
+                {
+                    b.HasOne("ChatApp.Domain.Models.AppUser", "User1")
+                        .WithMany()
+                        .HasForeignKey("User1Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ChatApp.Domain.Models.AppUser", "User2")
+                        .WithMany()
+                        .HasForeignKey("User2Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User1");
+
+                    b.Navigation("User2");
+                });
+
             modelBuilder.Entity("ChatApp.Domain.Models.Message", b =>
                 {
-                    b.HasOne("ChatApp.Domain.Models.AppUser", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId");
+                    b.HasOne("ChatApp.Domain.Models.Chat", "Chat")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ChatApp.Domain.Models.AppUser", "Sender")
                         .WithMany()
@@ -202,7 +250,7 @@ namespace ChatApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Receiver");
+                    b.Navigation("Chat");
 
                     b.Navigation("Sender");
                 });
@@ -232,6 +280,11 @@ namespace ChatApp.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ChatApp.Domain.Models.Chat", b =>
+                {
+                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }

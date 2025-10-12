@@ -12,6 +12,8 @@ namespace ChatApp.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services) 
         {
+            // SignalR
+            services.AddSignalR();
             // Mapster
             var mapsterConfig = new TypeAdapterConfig();
             mapsterConfig.Scan(Assembly.GetExecutingAssembly());

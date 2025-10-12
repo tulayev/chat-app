@@ -1,17 +1,20 @@
 [
   {
-    "Content": "Hello, Jon! How are you?",
+    "ChatId": 1,
     "SenderId": 2,
-    "ReceiverId": 1
+    "Content": "Hello, Jon! How are you?",
+    "SentAt": "2025-10-12T16:10:00Z"
   },
   {
-    "Content": "Hi, Lisa! I'm fine, and you?",
+    "ChatId": 1,
     "SenderId": 1,
-    "ReceiverId": 2
+    "Content": "Hi, Lisa! I'm fine, and you?",
+    "SentAt": "2025-10-12T16:11:00Z"
   },
   {
-    "Content": "I am Rob!",
+    "ChatId": 2,
     "SenderId": 3,
-    "ReceiverId": 1
+    "Content": "I am Rob!",
+    "SentAt": "2025-10-12T16:12:00Z"
   }
 ]

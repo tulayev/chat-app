@@ -1,4 +1,5 @@
 ﻿using ChatApp.API.Extensions;
+using ChatApp.Application.CQRS.Messages.Commands;
 using ChatApp.Application.CQRS.Messages.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -16,22 +17,29 @@ namespace ChatApp.API.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("contacts")]
-        public async Task<IActionResult> GetChatContacts()
+        [HttpGet("userChats")]
+        public async Task<IActionResult> GetUserChats()
         {
-            var currentUserId = User.GetUserId();
-            var response = await _mediator.Send(new GetChatContactsQuery(currentUserId));
+            var response = await _mediator.Send(new GetUserChatsQuery(User.GetUserId()));
 
             return HandleResponse(response);
         }
 
-        [HttpGet("history/{withUserId}")]
-        public async Task<IActionResult> GetChatHistory(int withUserId)
+        [HttpGet("{chatId}/messages")]
+        public async Task<IActionResult> GetChatMessages(int chatId)
         {
-            var currentUserId = User.GetUserId();
-            var response = await _mediator.Send(new GetChatHistoryQuery(currentUserId!, withUserId));
+            var response = await _mediator.Send(new GetChatMessagesQuery(chatId));
 
             return HandleResponse(response);
+        }
+
+        [HttpPost("sendMessage")]
+        public async Task<IActionResult> SendMessage([FromBody] SendMessageCommand command)
+        {
+            command.SenderId = User.GetUserId();
+            await _mediator.Send(command);
+
+            return Ok();
         }
     }
 }

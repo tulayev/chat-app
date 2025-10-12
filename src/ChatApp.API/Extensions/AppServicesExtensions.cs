@@ -4,8 +4,6 @@
     {
         public static IServiceCollection AddAppServices(this IServiceCollection services)
         {
-            services.AddSignalR();
-
             // CORS
             services.AddCors(options =>
             {

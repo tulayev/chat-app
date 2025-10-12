@@ -1,7 +1,7 @@
 using ChatApp.API.Extensions;
-using ChatApp.API.Hubs;
 using ChatApp.API.Middlewares;
 using ChatApp.Application;
+using ChatApp.Application.Hubs;
 using ChatApp.Infrastructure;
 using NLog;
 

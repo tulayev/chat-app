@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiResponse, ChatContact, ChatHistory } from '@app/models';
+import { ApiResponse, UserChat, ChatMessage } from '@app/models';
 import { AuthService } from '@core/services/auth.service';
 import { environment } from '@environments/environment';
 import * as signalR from '@microsoft/signalr';
@@ -10,49 +10,53 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
   providedIn: 'root'
 })
 export class ChatService {
-  private messagesSource = new BehaviorSubject<ChatHistory[]>([]);
+  private messagesSource = new BehaviorSubject<ChatMessage[]>([]);
   messages$ = this.messagesSource.asObservable();
   private readonly chatHubUrl = `${environment.baseUrl}/hubs/chat`;
   private readonly apiUrl = `${environment.apiUrl}`;
-  private readonly hubConnection: signalR.HubConnection;
+  private hubConnection!: signalR.HubConnection;
 
   constructor(
     private readonly auth: AuthService,
-    private readonly http: HttpClient) {
+    private readonly http: HttpClient) { }
+
+  async start(): Promise<void> {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(this.chatHubUrl, {
         accessTokenFactory: () => this.auth.user?.token ?? ''
       })
       .withAutomaticReconnect()
       .build();
-  }
 
-  async start(): Promise<void> {
-    await this.hubConnection.start();
-    console.log("Connected to SignalR");
-
-    this.hubConnection.on('ReceiveMessage', (senderId, content, sentAt) => {
-      const realTimeMessage: ChatHistory = {
-        id: 0,
-        content: content,
-        sentAt: sentAt,
-        from: { id: senderId, username: '', email: '', avatarUrl: '' },
-        to: { id: 0, username: '', email: '', avatarUrl: '' },
-      };
-      this.messagesSource.next([...this.messagesSource.value, realTimeMessage]);
+    this.hubConnection.on('ReceiveMessage', (message: ChatMessage) => {
+      const current = this.messagesSource.value;
+      this.messagesSource.next([...current, message]);
     });
+
+    await this.hubConnection.start();
   }
 
-  sendPrivateMessage(receiverId: number, content: string): void {
-    this.hubConnection.invoke('SendPrivateMessage', receiverId, content);
+  joinChat(chatId: number): void {
+    this.hubConnection.invoke('JoinChat', chatId);
   }
 
-  loadChatContacts(): Observable<ApiResponse<ChatContact[]>> {
-    return this.http.get<ApiResponse<ChatContact[]>>(`${this.apiUrl}/chat/contacts`);
+  leaveChat(chatId: number): void {
+    this.hubConnection.invoke('LeaveChat', chatId);
   }
 
-  loadChatHistory(withUserId: number): Subscription {
-    return this.http.get<ApiResponse<ChatHistory[]>>(`${this.apiUrl}/chat/history/${withUserId}`)
+  sendPrivateMessage(chatId: number, content: string): void {
+    this.http.post(`${this.apiUrl}/chat/sendMessage`, {
+      chatId,
+      content
+    }).subscribe();
+  }
+
+  loadUserChats(): Observable<ApiResponse<UserChat[]>> {
+    return this.http.get<ApiResponse<UserChat[]>>(`${this.apiUrl}/chat/userChats`);
+  }
+
+  loadChatMessages(chatId: number): Subscription {
+    return this.http.get<ApiResponse<ChatMessage[]>>(`${this.apiUrl}/chat/${chatId}/messages`)
       .subscribe(({ data }) => {
         this.messagesSource.next(data);
       });

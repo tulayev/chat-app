@@ -3,5 +3,10 @@ using MediatR;
 
 namespace ChatApp.Application.CQRS.Messages.Commands
 {
-    public record SendMessageCommand(int SenderId, int ReceiverId, string Content) : IRequest<SendMessageDto>;
+    public class SendMessageCommand : IRequest<SendMessageDto>
+    {
+        public int ChatId { get; set; }
+        public int SenderId { get; set; }
+        public string? Content { get; set; }
+    }
 }

@@ -31,6 +31,30 @@ namespace ChatApp.Infrastructure.Data.Seed
             }
         }
 
+        public static async Task SeedChats(ChatAppDbContext db)
+        {
+            if (await db.Chats.AnyAsync())
+            {
+                return;
+            }
+
+            var filePath = $"{SeedFolder}/seed_chats.json";
+            var chatData = await File.ReadAllTextAsync(filePath);
+            var chats = JsonSerializer.Deserialize<List<Chat>>(chatData);
+
+            if (chats == null)
+            {
+                return;
+            }
+
+            await db.Chats.AddRangeAsync(chats);
+
+            if (db.ChangeTracker.HasChanges())
+            {
+                await db.SaveChangesAsync();
+            }
+        }
+
         public static async Task SeedMessages(ChatAppDbContext db)
         {
             if (await db.Messages.AnyAsync())

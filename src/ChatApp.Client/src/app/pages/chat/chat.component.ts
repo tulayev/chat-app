@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AuthUser, ChatContact, ChatHistory } from '@app/models';
-import { AuthService, ChatService } from '@core/services';
+import { ChatMessage, UserChat } from '@app/models';
+import { ChatService } from '@core/services';
 import { map, Observable } from 'rxjs';
 
 @Component({
@@ -12,16 +12,12 @@ import { map, Observable } from 'rxjs';
   templateUrl: './chat.component.html'
 })
 export class ChatComponent implements OnInit {
-  chatContacts$!: Observable<ChatContact[]>;
-  messages$!: Observable<ChatHistory[]>;
-  user!: AuthUser | null;
-  chatContactId!: number;
+  userChats$!: Observable<UserChat[]>;
+  chatMessages$!: Observable<ChatMessage[]>;
+  currentChat!: UserChat;
   newMessage = '';
 
-  constructor(
-    private readonly chatService: ChatService,
-    private readonly authService: AuthService
-  ) { }
+  constructor(private readonly chatService: ChatService) { }
 
   async ngOnInit(): Promise<void> {
     await this.loadData();
@@ -32,20 +28,24 @@ export class ChatComponent implements OnInit {
       return;
     }
 
-    this.chatService.sendPrivateMessage(this.chatContactId, this.newMessage);
+    this.chatService.sendPrivateMessage(this.currentChat.chatId, this.newMessage);
     this.newMessage = '';
   }
 
-  onChatContactClick(userId: number): void {
-    this.chatContactId = userId;
-    this.chatService.loadChatHistory(this.chatContactId);
-    this.messages$ = this.chatService.messages$;
+  onUserChatClick(chat: UserChat): void {
+    if (this.currentChat?.chatId) {
+      this.chatService.leaveChat(this.currentChat.chatId);
+    }
+
+    this.currentChat = chat;
+    this.chatService.joinChat(this.currentChat.chatId);
+    this.chatService.loadChatMessages(this.currentChat.chatId);
+    this.chatMessages$ = this.chatService.messages$;
   }
 
   private async loadData(): Promise<void> {
-    this.user = this.authService.user;
     // contacts
-    this.chatContacts$ = this.chatService.loadChatContacts().pipe(
+    this.userChats$ = this.chatService.loadUserChats().pipe(
       map(({ data }) => data)
     );
     // start signalR for real-time chat

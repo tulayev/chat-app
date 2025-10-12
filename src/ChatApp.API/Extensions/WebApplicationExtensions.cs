@@ -21,6 +21,7 @@ namespace ChatApp.API.Extensions
                     await db.Database.MigrateAsync();
                     // Seed data
                     await SeedData.SeedUsers(userManager);
+                    await SeedData.SeedChats(db);
                     await SeedData.SeedMessages(db);
                 }
                 catch (Exception ex)
