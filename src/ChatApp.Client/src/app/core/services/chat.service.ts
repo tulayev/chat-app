@@ -55,8 +55,8 @@ export class ChatService {
     this.hubConnection.invoke('LeaveChat', chatId);
   }
 
-  sendPrivateMessage(chatId: number, content: string): Observable<ApiResponse<ChatMessage>> {
-    return this.http.post<ApiResponse<ChatMessage>>(`${this.apiUrl}/chat/sendMessage`, {
+  sendPrivateMessage(chatId: number, content: string): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/chat/sendMessage`, {
       chatId,
       content
     });
