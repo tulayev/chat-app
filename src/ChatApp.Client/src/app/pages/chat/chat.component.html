@@ -45,7 +45,7 @@
             <div class="bg-gray-200 h-screen overflow-y-auto p-4 pb-36">
                 @for (message of chatMessages$ | async; track message.id) {
                     <!-- Incoming Message -->
-                    @if (message.sender.id === currentChat.contact.id) {
+                    @if (message.sender && message.sender.id === currentChat.contact.id) {
                         <div class="flex mb-4 cursor-pointer">
                             <div class="w-9 h-9 rounded-full flex items-center justify-center mr-2">
                                 <img 
@@ -59,7 +59,7 @@
                             </div>
                         </div>
                     }
-                    @if (message.sender.id !== currentChat.contact.id) {
+                    @if (message.sender && message.sender.id !== currentChat.contact.id) {
                         <!-- Outgoing Message -->
                         <div class="flex justify-end mb-4 cursor-pointer">
                             <div class="flex max-w-96 bg-indigo-500 text-white rounded-lg p-3 gap-3">
@@ -86,7 +86,7 @@
                         placeholder="Type a message..." 
                     />
                     <button 
-                        (click)="send()" 
+                        (click)="onSendClick()" 
                         class="bg-indigo-500 text-white px-4 py-2 rounded-md ml-2"
                     >
                         Send

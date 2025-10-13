@@ -23,15 +23,6 @@ export class ChatComponent implements OnInit {
     await this.loadData();
   }
 
-  send(): void {
-    if (!this.newMessage.trim()) {
-      return;
-    }
-
-    this.chatService.sendPrivateMessage(this.currentChat.chatId, this.newMessage);
-    this.newMessage = '';
-  }
-
   onUserChatClick(chat: UserChat): void {
     if (this.currentChat?.chatId) {
       this.chatService.leaveChat(this.currentChat.chatId);
@@ -39,8 +30,20 @@ export class ChatComponent implements OnInit {
 
     this.currentChat = chat;
     this.chatService.joinChat(this.currentChat.chatId);
-    this.chatService.loadChatMessages(this.currentChat.chatId);
+
+    this.chatService.loadChatMessages(this.currentChat.chatId).subscribe();
     this.chatMessages$ = this.chatService.messages$;
+  }
+
+  onSendClick(): void {
+    if (!this.newMessage.trim()) {
+      return;
+    }
+
+    this.chatService.sendPrivateMessage(this.currentChat.chatId, this.newMessage)
+      .subscribe(() => {
+        this.newMessage = '';
+      });
   }
 
   private async loadData(): Promise<void> {

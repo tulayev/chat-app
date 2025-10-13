@@ -21,7 +21,6 @@ namespace ChatApp.API.Controllers
         public async Task<IActionResult> GetUserChats()
         {
             var response = await _mediator.Send(new GetUserChatsQuery(User.GetUserId()));
-
             return HandleResponse(response);
         }
 
@@ -29,7 +28,6 @@ namespace ChatApp.API.Controllers
         public async Task<IActionResult> GetChatMessages(int chatId)
         {
             var response = await _mediator.Send(new GetChatMessagesQuery(chatId));
-
             return HandleResponse(response);
         }
 
@@ -37,9 +35,9 @@ namespace ChatApp.API.Controllers
         public async Task<IActionResult> SendMessage([FromBody] SendMessageCommand command)
         {
             command.SenderId = User.GetUserId();
-            await _mediator.Send(command);
+            var response = await _mediator.Send(command);
 
-            return Ok();
+            return HandleResponse(response);
         }
     }
 }

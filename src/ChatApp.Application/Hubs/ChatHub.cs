@@ -21,17 +21,5 @@ namespace ChatApp.Application.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"chat-{chatId}");
         }
-
-        // Sending message (called from frontend)
-        public async Task SendMessage(int chatId, int senderId, string content)
-        {
-            await Clients.Group($"chat-{chatId}").SendAsync("ReceiveMessage", new
-            {
-                ChatId = chatId,
-                SenderId = senderId,
-                Content = content,
-                SentAt = DateTime.Now
-            });
-        }
     }
 }

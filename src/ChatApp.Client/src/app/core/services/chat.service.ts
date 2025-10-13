@@ -4,7 +4,7 @@ import { ApiResponse, UserChat, ChatMessage } from '@app/models';
 import { AuthService } from '@core/services/auth.service';
 import { environment } from '@environments/environment';
 import * as signalR from '@microsoft/signalr';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +36,17 @@ export class ChatService {
     await this.hubConnection.start();
   }
 
+  loadUserChats(): Observable<ApiResponse<UserChat[]>> {
+    return this.http.get<ApiResponse<UserChat[]>>(`${this.apiUrl}/chat/userChats`);
+  }
+
+  loadChatMessages(chatId: number): Observable<ApiResponse<ChatMessage[]>> {
+    return this.http.get<ApiResponse<ChatMessage[]>>(`${this.apiUrl}/chat/${chatId}/messages`)
+      .pipe(
+        tap(({ data }) => this.messagesSource.next(data))
+      );
+  }
+
   joinChat(chatId: number): void {
     this.hubConnection.invoke('JoinChat', chatId);
   }
@@ -44,21 +55,10 @@ export class ChatService {
     this.hubConnection.invoke('LeaveChat', chatId);
   }
 
-  sendPrivateMessage(chatId: number, content: string): void {
-    this.http.post(`${this.apiUrl}/chat/sendMessage`, {
+  sendPrivateMessage(chatId: number, content: string): Observable<ApiResponse<ChatMessage>> {
+    return this.http.post<ApiResponse<ChatMessage>>(`${this.apiUrl}/chat/sendMessage`, {
       chatId,
       content
-    }).subscribe();
-  }
-
-  loadUserChats(): Observable<ApiResponse<UserChat[]>> {
-    return this.http.get<ApiResponse<UserChat[]>>(`${this.apiUrl}/chat/userChats`);
-  }
-
-  loadChatMessages(chatId: number): Subscription {
-    return this.http.get<ApiResponse<ChatMessage[]>>(`${this.apiUrl}/chat/${chatId}/messages`)
-      .subscribe(({ data }) => {
-        this.messagesSource.next(data);
-      });
+    });
   }
 }
