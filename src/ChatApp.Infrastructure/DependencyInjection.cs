@@ -1,9 +1,11 @@
-﻿using ChatApp.Application.Common.Interfaces.Images;
+﻿using ChatApp.Application.Common.Interfaces.Email;
+using ChatApp.Application.Common.Interfaces.Images;
 using ChatApp.Application.Common.Interfaces.Repositories;
 using ChatApp.Application.Common.Interfaces.Security;
 using ChatApp.Domain.Models;
 using ChatApp.Infrastructure.Data;
 using ChatApp.Infrastructure.Repositories;
+using ChatApp.Infrastructure.Services.Email;
 using ChatApp.Infrastructure.Services.Images;
 using ChatApp.Infrastructure.Services.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SQLitePCL;
+using StackExchange.Redis;
 using System.Text;
 
 namespace ChatApp.Infrastructure
@@ -24,6 +27,10 @@ namespace ChatApp.Infrastructure
             // DB (SQLite)
             Batteries_V2.Init();
             services.AddDbContext<ChatAppDbContext>(options => options.UseSqlite(config.GetConnectionString("Default")));
+            // Redis
+            services.AddSingleton<IConnectionMultiplexer>(
+                ConnectionMultiplexer.Connect($"{config["Redis:Host"] ?? "localhost"}:{config["Redis:Port"] ?? "6379"}")
+            );
             // Identity Core
             services.AddIdentityCore<AppUser>(options =>
             {
@@ -69,6 +76,8 @@ namespace ChatApp.Infrastructure
             // Custom Services
             services.AddScoped<IImageStoreService, ImageStoreService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+            services.AddScoped<IEmailSenderService, EmailSenderService>();
 
             return services;
         }

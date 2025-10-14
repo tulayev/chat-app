@@ -37,7 +37,7 @@ export class ChatService {
   }
 
   loadUserChats(): Observable<ApiResponse<UserChat[]>> {
-    return this.http.get<ApiResponse<UserChat[]>>(`${this.apiUrl}/chat/userChats`);
+    return this.http.get<ApiResponse<UserChat[]>>(`${this.apiUrl}/chat/userchats`);
   }
 
   loadChatMessages(chatId: number): Observable<ApiResponse<ChatMessage[]>> {
@@ -56,7 +56,7 @@ export class ChatService {
   }
 
   sendPrivateMessage(chatId: number, content: string): Observable<ApiResponse<void>> {
-    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/chat/sendMessage`, {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/chat/sendmessage`, {
       chatId,
       content
     });

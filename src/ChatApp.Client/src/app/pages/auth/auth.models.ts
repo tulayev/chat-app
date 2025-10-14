@@ -9,3 +9,11 @@ export interface LoginForm {
   usernameOrEmail: string;
   password: string;
 }
+
+export interface SendCodeForm {
+  email: string;
+}
+
+export interface VerifyCodeForm extends SendCodeForm {
+  code: string;
+}

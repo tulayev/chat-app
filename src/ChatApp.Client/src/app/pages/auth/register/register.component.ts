@@ -34,7 +34,7 @@ export class RegisterComponent {
 
   onSubmit(): void {
     this.auth.register(this.form).subscribe({
-      next: () => this.router.navigate(['/chat']),
+      next: () => this.router.navigate(['/verify-email'], { queryParams: { emaiil: this.form.email } }),
       error: err => this.error = err.error?.message || 'Registration failed'
     });
   }
