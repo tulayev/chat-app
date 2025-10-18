@@ -1,12 +1,13 @@
 ﻿using ChatApp.Application.Common.Interfaces.Security;
 using ChatApp.Application.CQRS.EmailVerification.Commands;
+using ChatApp.Application.Helpers;
 using ChatApp.Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 namespace ChatApp.Application.CQRS.EmailVerification.Handlers
 {
-    public class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommand>
+    public class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommand, ApiResponse<string>>
     {
         private readonly IVerificationCodeService _verificationCodeService;
         private readonly UserManager<AppUser> _userManager;
@@ -17,7 +18,7 @@ namespace ChatApp.Application.CQRS.EmailVerification.Handlers
             _userManager = userManager;
         }
 
-        public async Task Handle(VerifyEmailCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<string>> Handle(VerifyEmailCommand request, CancellationToken cancellationToken)
         {
             var storedCode = await _verificationCodeService.GetCodeAsync(request.Email) 
                 ?? throw new InvalidOperationException("Code expired or not found");
@@ -33,6 +34,8 @@ namespace ChatApp.Application.CQRS.EmailVerification.Handlers
             await _userManager.UpdateAsync(user);
 
             await _verificationCodeService.DeleteCodeAsync(request.Email);
+
+            return ApiResponse<string>.Ok("Email verified");
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using ChatApp.Application.CQRS.EmailVerification.Commands;
-using ChatApp.Application.Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,15 +16,15 @@ namespace ChatApp.API.Controllers
         [HttpPost("send")]
         public async Task<IActionResult> Send([FromBody] SendVerificationCodeCommand request)
         {
-            await _mediator.Send(request);
-            return HandleResponse(ApiResponse<string>.Ok("Verification code sent"));
+            var response = await _mediator.Send(request);
+            return HandleResponse(response);
         }
 
         [HttpPost("verify")]
         public async Task<IActionResult> Verify([FromBody] VerifyEmailCommand request)
         {
-            await _mediator.Send(request);
-            return HandleResponse(ApiResponse<string>.Ok("Email verified"));
+            var response = await _mediator.Send(request);
+            return HandleResponse(response);
         }
     }
 }

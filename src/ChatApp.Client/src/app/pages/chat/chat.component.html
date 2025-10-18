@@ -33,7 +33,7 @@
             }
 		</div>
 	</aside>
-    @if (currentChat) {
+    @if (currentChat$ | async; as currentChat) {
         <!-- Main Chat Area -->
         <div class="flex-1">
             <!-- Chat Header -->

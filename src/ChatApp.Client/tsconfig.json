@@ -11,6 +11,7 @@
       "@models": ["app/models/*"],
       "@pages/*": ["app/pages/*"],
       "@shared/*": ["app/shared/*"],
+      "@store/*": ["app/store/*"],
     },
     "strict": true,
     "noImplicitOverride": true,
