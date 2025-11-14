@@ -14,7 +14,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SQLitePCL;
 using StackExchange.Redis;
 using System.Text;
 
@@ -24,13 +23,17 @@ namespace ChatApp.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config) 
         {
-            // DB (SQLite)
-            Batteries_V2.Init();
-            services.AddDbContext<ChatAppDbContext>(options => options.UseSqlite(config.GetConnectionString("Default")));
+            // DB
+            services.AddDbContext<ChatAppDbContext>(options => options.UseNpgsql(config.GetConnectionString("Default")));
             // Redis
-            services.AddSingleton<IConnectionMultiplexer>(
-                ConnectionMultiplexer.Connect($"{config["Redis:Host"] ?? "localhost"}:{config["Redis:Port"] ?? "6379"}")
-            );
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                var redisHost = config["Redis:Host"] ?? "localhost";
+                var redisPort = config["Redis:Port"] ?? "6379";
+
+                return ConnectionMultiplexer.Connect($"{redisHost}:{redisPort}");
+            });
             // Identity Core
             services.AddIdentityCore<AppUser>(options =>
             {
