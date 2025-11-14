@@ -6,7 +6,6 @@ services:
     build:
       context: .
       dockerfile: ./dockerfiles/ChatApp.API/Dockerfile.dev
-    command: dotnet watch run --urls=http://0.0.0.0:8080
     env_file:
       - ./.env
     ports:
