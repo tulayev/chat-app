@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  api:
+    container_name: chatapp_api
+    build:
+      context: .
+      dockerfile: ./dockerfiles/ChatApp.API/Dockerfile.dev
+    command: dotnet watch run --urls=http://0.0.0.0:8080
+    env_file:
+      - ./.env
+    ports:
+      - "5000:8080"
+    volumes:
+      - ./:/app
+      - ~/.nuget/packages:/root/.nuget/packages:ro
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - chatapp_network
+
+  client:
+    container_name: chatapp_client
+    build:
+      context: ./ChatApp.Client
+      dockerfile: ../dockerfiles/ChatApp.Client/Dockerfile.dev
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./ChatApp.Client:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    networks:
+      - chatapp_network
+
+  postgres:
+    container_name: chatapp_postgres
+    image: postgres:17
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ChatDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - chatapp_network
+
+  redis:
+    container_name: chatapp_redis
+    image: redis:7.2
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - chatapp_network
+
+volumes:
+  postgres_data:
+
+networks:
+  chatapp_network:

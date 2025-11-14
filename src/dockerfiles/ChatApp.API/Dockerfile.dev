@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS dev
+WORKDIR /app
+
+# Copy only project files first (for caching)
+COPY ChatApp.API/ChatApp.API.csproj ChatApp.API/
+COPY ChatApp.Application/ChatApp.Application.csproj ChatApp.Application/
+COPY ChatApp.Domain/ChatApp.Domain.csproj ChatApp.Domain/
+COPY ChatApp.Infrastructure/ChatApp.Infrastructure.csproj ChatApp.Infrastructure/
+
+RUN dotnet restore ChatApp.API/ChatApp.API.csproj
+
+# Now copy everything
+COPY . .
+
+WORKDIR /app/ChatApp.API
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "watch", "run", "--urls=http://0.0.0.0:8080"]

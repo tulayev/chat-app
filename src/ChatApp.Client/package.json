@@ -9,7 +9,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "electron": "ng build && electron .",
-    "start:dev": "ng serve --c=development -o",
+    "start:dev": "ng serve --c=development --host 0.0.0.0",
     "build:dev": "ng build --c=development",
     "start:prod": "ng serve --c=production",
     "build:prod": "ng build --c=production"
