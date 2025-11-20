@@ -18,11 +18,12 @@ namespace ChatApp.API.Extensions
                 {
                     var db = services.GetRequiredService<ChatAppDbContext>();
                     var userManager = services.GetRequiredService<UserManager<AppUser>>();
+                    var env = services.GetRequiredService<IHostEnvironment>();
                     await db.Database.MigrateAsync();
                     // Seed data
-                    await SeedData.SeedUsers(userManager);
-                    await SeedData.SeedChats(db);
-                    await SeedData.SeedMessages(db);
+                    await SeedData.SeedUsers(userManager, env);
+                    await SeedData.SeedChats(db, env);
+                    await SeedData.SeedMessages(db, env);
                 }
                 catch (Exception ex)
                 {

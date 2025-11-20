@@ -24,4 +24,16 @@
     <ProjectReference Include="..\ChatApp.Domain\ChatApp.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\Seed\seed_chats.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\seed_messages.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\seed_users.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

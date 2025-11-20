@@ -1,22 +1,21 @@
 ﻿using ChatApp.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using System.Text.Json;
 
 namespace ChatApp.Infrastructure.Data.Seed
 {
     public static class SeedData
     {
-        private const string SeedFolder = "../ChatApp.Infrastructure/Data/Seed";
-
-        public static async Task SeedUsers(UserManager<AppUser> userManager)
+        public static async Task SeedUsers(UserManager<AppUser> userManager, IHostEnvironment env)
         {
             if (await userManager.Users.AnyAsync())
             {
                 return;
             }
 
-            var filePath = $"{SeedFolder}/seed_users.json";
+            var filePath = Path.Combine(GetSeedFolder(env), "seed_users.json");
             var userData = await File.ReadAllTextAsync(filePath);
             var users = JsonSerializer.Deserialize<List<AppUser>>(userData);
 
@@ -31,14 +30,14 @@ namespace ChatApp.Infrastructure.Data.Seed
             }
         }
 
-        public static async Task SeedChats(ChatAppDbContext db)
+        public static async Task SeedChats(ChatAppDbContext db, IHostEnvironment env)
         {
             if (await db.Chats.AnyAsync())
             {
                 return;
             }
 
-            var filePath = $"{SeedFolder}/seed_chats.json";
+            var filePath = Path.Combine(GetSeedFolder(env), "seed_chats.json");
             var chatData = await File.ReadAllTextAsync(filePath);
             var chats = JsonSerializer.Deserialize<List<Chat>>(chatData);
 
@@ -55,14 +54,14 @@ namespace ChatApp.Infrastructure.Data.Seed
             }
         }
 
-        public static async Task SeedMessages(ChatAppDbContext db)
+        public static async Task SeedMessages(ChatAppDbContext db, IHostEnvironment env)
         {
             if (await db.Messages.AnyAsync())
             {
                 return;
             }
 
-            var filePath = $"{SeedFolder}/seed_messages.json";
+            var filePath = Path.Combine(GetSeedFolder(env), "seed_messages.json");
             var messageData = await File.ReadAllTextAsync(filePath);
             var messages = JsonSerializer.Deserialize<List<Message>>(messageData);
 
@@ -76,6 +75,18 @@ namespace ChatApp.Infrastructure.Data.Seed
             if (db.ChangeTracker.HasChanges())
             {
                 await db.SaveChangesAsync();
+            }
+        }
+
+        private static string GetSeedFolder(IHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                return Path.Combine("../ChatApp.Infrastructure/Data/Seed");
+            }
+            else
+            {
+                return Path.Combine("Data/Seed");
             }
         }
     }

@@ -5,7 +5,6 @@
   "compilerOptions": {
     "baseUrl": "src",
     "paths": {
-      "@environments/*": ["environments/*"],
       "@app/*": ["app/*"],
       "@core/*": ["app/core/*"],
       "@models": ["app/models/*"],

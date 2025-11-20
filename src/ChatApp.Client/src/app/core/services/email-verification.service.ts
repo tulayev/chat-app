@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ApiResponse } from '@app/models';
 import { SendCodeForm, VerifyCodeForm } from '@app/pages/auth';
-import { environment } from '@environments/environment';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 
 @Injectable({

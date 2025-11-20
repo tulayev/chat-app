@@ -4,14 +4,23 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
+
+RUN npm install -g @angular/cli
 
 COPY . .
 
-RUN npm run build --prod
+RUN npm run build:prod
 
-FROM nginx:1.27
+FROM nginx:1.27-alpine
 
-COPY --from=build /app/dist/chatapp-client /usr/share/nginx/html
+# Remove default NGINX config (optional)
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy built Angular production files
+COPY --from=build /app/dist/ElectronClient/browser /usr/share/nginx/html
 
 EXPOSE 80
+
+# Default NGINX entrypoint
+CMD ["nginx", "-g", "daemon off;"]
