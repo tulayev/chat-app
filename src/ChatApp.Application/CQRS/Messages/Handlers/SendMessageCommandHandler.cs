@@ -32,7 +32,7 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
                 ChatId = command.ChatId,
                 SenderId = command.SenderId,
                 Content = command.Content!,
-                SentAt = DateTime.Now
+                SentAt = DateTime.UtcNow
             };
 
             await _unitOfWork.AddAsync(message);

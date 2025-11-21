@@ -11,7 +11,7 @@ namespace ChatApp.Domain.Models
         public DateTime SentAt { get; set; }
         public Chat Chat { get; set; } = null!;
         public AppUser Sender { get; set; } = null!;
-        public DateTimeOffset CreatedAt { get; set; }
-        public DateTimeOffset? UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

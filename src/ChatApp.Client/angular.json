@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ElectronClient": {
+    "ChatAppClient": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -69,10 +69,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ElectronClient:build:production"
+              "buildTarget": "ChatAppClient:build:production"
             },
             "development": {
-              "buildTarget": "ElectronClient:build:development"
+              "buildTarget": "ChatAppClient:build:development"
             }
           },
           "defaultConfiguration": "development"

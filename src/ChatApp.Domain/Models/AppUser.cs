@@ -7,7 +7,7 @@ namespace ChatApp.Domain.Models
     {
         public string? AvatarUrl { get; set; }
         public string? AvatarPublicId { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public DateTimeOffset? UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

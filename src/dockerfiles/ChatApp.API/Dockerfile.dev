@@ -8,7 +8,10 @@ COPY ChatApp.Infrastructure/ChatApp.Infrastructure.csproj ChatApp.Infrastructure
 
 RUN dotnet restore ChatApp.API/ChatApp.API.csproj
 
-COPY . .
+COPY ChatApp.API/ ChatApp.API/
+COPY ChatApp.Application/ ChatApp.Application/
+COPY ChatApp.Domain/ ChatApp.Domain/
+COPY ChatApp.Infrastructure/ ChatApp.Infrastructure/
 
 WORKDIR /app/ChatApp.API
 EXPOSE 8080
