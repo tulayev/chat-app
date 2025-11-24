@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ApiResponse, AuthUser } from '@app/models';
-import { environment } from '../../../environments/environment';
+import { environment } from 'environments/environment';
 import { LoginForm, RegisterForm } from '@pages/auth';
 import { Observable, tap } from 'rxjs';
 
