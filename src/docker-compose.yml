@@ -10,8 +10,6 @@ services:
       - ./.env
     ports:
       - "5000:8080"
-    volumes:
-      - ~/.nuget/packages:/root/.nuget/packages:ro
     depends_on:
       - postgres
       - redis
@@ -25,8 +23,6 @@ services:
       dockerfile: ../dockerfiles/ChatApp.Client/Dockerfile
     ports:
       - "4200:80"
-    volumes:
-      - ./ChatApp.Client:/app
     depends_on:
       - api
     networks:
