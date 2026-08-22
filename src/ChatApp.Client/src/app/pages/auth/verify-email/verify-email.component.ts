@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EmailVerificationService } from '@app/core/services';
@@ -31,15 +31,13 @@ export class VerifyEmail implements OnDestroy {
   sent = false;
 
   private redirectTimeout?: ReturnType<typeof setTimeout>;
+  private readonly emailVerificationService = inject(EmailVerificationService);
+  private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly destroy$ = inject(Destroy);
 
-  constructor(
-    private readonly auth: EmailVerificationService,
-    private readonly router: Router,
-    private readonly route: ActivatedRoute,
-    private readonly destroy$: Destroy
-  ) {
-    this.route.queryParams
-      .pipe(takeUntil(this.destroy$))
+  constructor() {
+    this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$))
       .subscribe(p => {
         if (p['email']) {
           this.sendCodeForm.patchValue({ email: p['email'] });
@@ -60,7 +58,7 @@ export class VerifyEmail implements OnDestroy {
     }
     this.message = '';
 
-    this.auth.sendVerificationCode(this.sendCodeForm.value as SendCodeForm).subscribe({
+    this.emailVerificationService.sendVerificationCode(this.sendCodeForm.value as SendCodeForm).subscribe({
       next: () => {
         this.sent = true;
         this.verifyCodeForm.patchValue({ email: this.sendCodeForm.value.email });
@@ -81,7 +79,7 @@ export class VerifyEmail implements OnDestroy {
     }
     this.message = '';
 
-    this.auth.verifyEmail(this.verifyCodeForm.value as VerifyCodeForm).subscribe({
+    this.emailVerificationService.verifyEmail(this.verifyCodeForm.value as VerifyCodeForm).subscribe({
       next: () => {
         this.messageType.set('success');
         this.message = 'Email successfully verified!';

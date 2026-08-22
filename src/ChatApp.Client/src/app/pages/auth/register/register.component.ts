@@ -29,6 +29,10 @@ export class RegisterComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
+  ngOnDestroy(): void {
+    this.revokeAvatarPreviewUrl();
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
 
@@ -37,17 +41,6 @@ export class RegisterComponent implements OnDestroy {
       this.form.controls.avatar.setValue(file);
       this.revokeAvatarPreviewUrl();
       this.avatarPreviewUrl.set(URL.createObjectURL(file));
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.revokeAvatarPreviewUrl();
-  }
-
-  private revokeAvatarPreviewUrl(): void {
-    const previous = this.avatarPreviewUrl();
-    if (previous) {
-      URL.revokeObjectURL(previous);
     }
   }
 
@@ -60,5 +53,13 @@ export class RegisterComponent implements OnDestroy {
     this.authService.register(this.form.value as RegisterForm).subscribe({
       next: () => this.router.navigate(['/verify-email'], { queryParams: { email: this.form.value.email } })
     });
+  }
+
+  private revokeAvatarPreviewUrl(): void {
+    const previous = this.avatarPreviewUrl();
+
+    if (previous) {
+      URL.revokeObjectURL(previous);
+    }
   }
 }

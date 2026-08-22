@@ -33,14 +33,14 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly store = inject(Store);
+  private readonly chatService = inject(ChatService);
+  private readonly destroy$ = inject(Destroy);
   readonly currentUser = this.authService.user;
 
-  constructor(
-    private readonly store: Store,
-    private readonly chatService: ChatService,
-    private readonly destroy$: Destroy) {
-      this.currentChat$ = this.store.select(selectCurrentChat);
-    }
+  constructor() {
+    this.currentChat$ = this.store.select(selectCurrentChat);
+  }
 
   async ngOnInit(): Promise<void> {
     // Start SignalR
@@ -57,8 +57,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
 
     // Subscribe to current chat and handle joining/loading
-    this.currentChat$
-      .pipe(
+    this.currentChat$.pipe(
         takeUntil(this.destroy$),
         filter((chat): chat is UserChat => !!chat),
         tap(chat => {
