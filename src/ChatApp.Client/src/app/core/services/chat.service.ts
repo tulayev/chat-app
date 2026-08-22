@@ -15,12 +15,17 @@ export class ChatService {
   private readonly chatHubUrl = `${environment.baseUrl}/hubs/chat`;
   private readonly apiUrl = `${environment.apiUrl}`;
   private hubConnection!: signalR.HubConnection;
+  private rejoinChatId: number | null = null;
 
   constructor(
     private readonly auth: AuthService,
     private readonly http: HttpClient) { }
 
   async start(): Promise<void> {
+    if (this.hubConnection && this.hubConnection.state !== signalR.HubConnectionState.Disconnected) {
+      return;
+    }
+
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(this.chatHubUrl, {
         accessTokenFactory: () => this.auth.user?.token ?? ''
@@ -33,7 +38,23 @@ export class ChatService {
       this.messagesSource.next([...current, message]);
     });
 
+    this.hubConnection.onreconnected(() => {
+      const chatId = this.rejoinChatId;
+      if (chatId != null) {
+        this.joinChat(chatId);
+      }
+    });
+
     await this.hubConnection.start();
+  }
+
+  async stop(): Promise<void> {
+    if (!this.hubConnection) {
+      return;
+    }
+
+    this.rejoinChatId = null;
+    await this.hubConnection.stop();
   }
 
   loadUserChats(): Observable<ApiResponse<UserChat[]>> {
@@ -48,11 +69,15 @@ export class ChatService {
   }
 
   joinChat(chatId: number): void {
-    this.hubConnection.invoke('JoinChat', chatId);
+    this.rejoinChatId = chatId;
+    this.hubConnection.invoke('JoinChat', chatId).catch(err => console.error('JoinChat failed', err));
   }
 
   leaveChat(chatId: number): void {
-    this.hubConnection.invoke('LeaveChat', chatId);
+    if (this.rejoinChatId === chatId) {
+      this.rejoinChatId = null;
+    }
+    this.hubConnection.invoke('LeaveChat', chatId).catch(err => console.error('LeaveChat failed', err));
   }
 
   sendPrivateMessage(chatId: number, content: string): Observable<ApiResponse<void>> {

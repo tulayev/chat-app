@@ -11,7 +11,11 @@ export class ChatEffects {
       this.actions$.pipe(
         ofType(ChatActions.setCurrentChat),
         tap(({ chat }) => {
-          localStorage.setItem('currentChat', JSON.stringify(chat));
+          try {
+            localStorage.setItem('currentChat', JSON.stringify(chat));
+          } catch (err) {
+            console.error('Failed to persist current chat', err);
+          }
         })
       ),
     { dispatch: false }
@@ -21,7 +25,13 @@ export class ChatEffects {
     () =>
       this.actions$.pipe(
         ofType(ChatActions.clearCurrentChat),
-        tap(() => localStorage.removeItem('currentChat'))
+        tap(() => {
+          try {
+            localStorage.removeItem('currentChat');
+          } catch (err) {
+            console.error('Failed to clear current chat', err);
+          }
+        })
       ),
     { dispatch: false }
   );

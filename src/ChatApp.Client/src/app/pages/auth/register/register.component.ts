@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegisterForm } from '../auth.models';
 import { Router, RouterModule } from '@angular/router';
@@ -17,7 +17,7 @@ import { avatarFileValidator, passwordStrengthValidator } from '@shared/validato
   ],
   templateUrl: './register.component.html'
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnDestroy {
   form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     username: new FormControl('', [Validators.required, Validators.minLength(3)]),
@@ -35,7 +35,19 @@ export class RegisterComponent {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       this.form.controls.avatar.setValue(file);
+      this.revokeAvatarPreviewUrl();
       this.avatarPreviewUrl.set(URL.createObjectURL(file));
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.revokeAvatarPreviewUrl();
+  }
+
+  private revokeAvatarPreviewUrl(): void {
+    const previous = this.avatarPreviewUrl();
+    if (previous) {
+      URL.revokeObjectURL(previous);
     }
   }
 

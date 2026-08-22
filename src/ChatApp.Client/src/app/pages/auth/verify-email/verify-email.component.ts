@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EmailVerificationService } from '@app/core/services';
 import { SendCodeForm, VerifyCodeForm } from '../auth.models';
 import { LucideMail, LucideKeyRound, LucideCircleCheck, LucideCircleAlert } from '@lucide/angular';
 import { TextFieldComponent } from '@shared/components';
+import { Destroy } from '@core/utils';
+import { takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-verify-email',
@@ -13,9 +15,10 @@ import { TextFieldComponent } from '@shared/components';
     CommonModule, ReactiveFormsModule, RouterModule, TextFieldComponent,
     LucideMail, LucideKeyRound, LucideCircleCheck, LucideCircleAlert
   ],
-  templateUrl: './verify-email.component.html'
+  templateUrl: './verify-email.component.html',
+  providers: [Destroy]
 })
-export class VerifyEmail {
+export class VerifyEmail implements OnDestroy {
   sendCodeForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email])
   });
@@ -27,16 +30,27 @@ export class VerifyEmail {
   messageType = signal<'success' | 'error'>('success');
   sent = false;
 
+  private redirectTimeout?: ReturnType<typeof setTimeout>;
+
   constructor(
     private readonly auth: EmailVerificationService,
     private readonly router: Router,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private readonly destroy$: Destroy
   ) {
-    this.route.queryParams.subscribe(p => {
-      if (p['email']) {
-        this.sendCodeForm.patchValue({ email: p['email'] });
-      }
-    });
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(p => {
+        if (p['email']) {
+          this.sendCodeForm.patchValue({ email: p['email'] });
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.redirectTimeout) {
+      clearTimeout(this.redirectTimeout);
+    }
   }
 
   onSendCode() {
@@ -71,7 +85,7 @@ export class VerifyEmail {
       next: () => {
         this.messageType.set('success');
         this.message = 'Email successfully verified!';
-        setTimeout(() => this.router.navigate(['/login']), 1500);
+        this.redirectTimeout = setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: (err) => {
         this.messageType.set('error');

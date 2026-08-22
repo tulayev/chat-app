@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatMessage, UserChat } from '@app/models';
 import { selectCurrentChat } from '@app/store';
@@ -24,7 +24,7 @@ import { AvatarComponent } from '@shared/components';
   templateUrl: './chat.component.html',
   providers: [Destroy]
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
   userChats$!: Observable<UserChat[]>;
   chatMessages$!: Observable<ChatMessage[]>;
   currentChat$!: Observable<UserChat | null>;
@@ -70,6 +70,18 @@ export class ChatComponent implements OnInit {
       .subscribe();
   }
 
+  ngOnDestroy(): void {
+    this.currentChat$
+      .pipe(take(1))
+      .subscribe(current => {
+        if (current?.chatId) {
+          this.chatService.leaveChat(current.chatId);
+        }
+      });
+
+    this.chatService.stop();
+  }
+
   onUserChatClick(chat: UserChat): void {
     // Leave previous chat before switching
     this.currentChat$
@@ -111,6 +123,16 @@ export class ChatComponent implements OnInit {
   }
 
   onLogout(): void {
+    this.currentChat$
+      .pipe(take(1))
+      .subscribe(current => {
+        if (current?.chatId) {
+          this.chatService.leaveChat(current.chatId);
+        }
+      });
+
+    this.chatService.stop();
+    this.store.dispatch(ChatActions.clearCurrentChat());
     this.authService.logout();
     this.router.navigate(['/login']);
   }

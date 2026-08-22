@@ -6,4 +6,4 @@ export const setCurrentChat = createAction(
   props<{ chat: UserChat }>()
 );
 
-export const clearCurrentChat = createAction('[Chat] Claer Current Chat');
+export const clearCurrentChat = createAction('[Chat] Clear Current Chat');
