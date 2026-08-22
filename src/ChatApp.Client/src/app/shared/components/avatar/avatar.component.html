@@ -1,0 +1,15 @@
+@if (src) {
+  <img
+    [src]="src"
+    [alt]="name"
+    [class]="sizeClasses"
+    class="rounded-full object-cover shrink-0 ring-2 ring-white shadow-sm"
+  />
+} @else {
+  <div
+    [class]="sizeClasses"
+    class="flex items-center justify-center rounded-full bg-primary-100 text-primary-700 font-semibold shrink-0 ring-2 ring-white shadow-sm"
+  >
+    {{ initial }}
+  </div>
+}

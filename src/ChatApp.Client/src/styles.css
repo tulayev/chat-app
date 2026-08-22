@@ -2,3 +2,88 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    @apply font-sans;
+  }
+}
+
+@layer components {
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium
+           transition duration-150 ease-out
+           focus:outline-none focus-visible:ring-4
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none
+           active:scale-[0.98];
+  }
+  .btn-primary {
+    @apply btn bg-primary-600 text-white shadow-soft hover:bg-primary-700 focus-visible:ring-primary-200;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:ring-gray-200;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-gray-600 hover:bg-gray-100 focus-visible:ring-gray-200;
+  }
+  .btn-icon {
+    @apply btn p-2.5 rounded-full;
+  }
+
+  /* Form controls */
+  .input-field {
+    @apply w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900
+           placeholder-gray-400 shadow-sm transition-colors duration-200
+           focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-100
+           disabled:bg-gray-50 disabled:text-gray-500;
+  }
+  .input-field--icon {
+    @apply pl-10;
+  }
+  .input-field--error {
+    @apply border-red-400 focus:border-red-500 focus:ring-red-100;
+  }
+  .form-label {
+    @apply block mb-1.5 text-sm font-medium text-gray-700;
+  }
+  .form-error {
+    @apply mt-1.5 text-sm text-red-600;
+  }
+
+  /* Surfaces */
+  .card {
+    @apply rounded-2xl border border-gray-100 bg-white shadow-card;
+  }
+  .auth-card {
+    @apply card w-full max-w-md rounded-4xl p-8;
+  }
+
+  /* Alerts */
+  .alert {
+    @apply flex items-start gap-2 rounded-lg border px-4 py-3 text-sm;
+  }
+  .alert-error {
+    @apply alert border-red-200 bg-red-50 text-red-700;
+  }
+  .alert-success {
+    @apply alert border-green-200 bg-green-50 text-green-700;
+  }
+
+  /* Chat */
+  .chat-bubble {
+    @apply max-w-[75%] sm:max-w-96 break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm;
+  }
+  .chat-bubble-in {
+    @apply chat-bubble rounded-bl-md bg-white text-gray-800;
+  }
+  .chat-bubble-out {
+    @apply chat-bubble rounded-br-md bg-primary-600 text-white;
+  }
+  .contact-item {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 cursor-pointer transition-colors duration-150 hover:bg-gray-100;
+  }
+  .contact-item-active {
+    @apply contact-item bg-primary-50 hover:bg-primary-50;
+  }
+}

@@ -1,60 +1,70 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-    <div class="bg-white shadow-lg rounded-2xl w-full max-w-md p-8">
-        <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">
-        {{ sent ? 'Введите код подтверждения' : 'Подтвердите ваш email' }}
-        </h2>
+<section class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-10">
+    <div class="auth-card text-center">
+        @if (sent) {
+            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary-100 text-primary-700 mx-auto mb-4">
+                <svg lucideKeyRound class="w-6 h-6"></svg>
+            </div>
+        }
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-1">
+            {{ sent ? 'Enter the verification code' : 'Verify your email' }}
+        </h1>
+        <p class="text-sm text-gray-500 mb-6">
+            {{ sent ? 'We sent a code to ' + sendCodeForm.email : 'We will send a one-time code to your inbox' }}
+        </p>
 
-        <!-- Email input -->
-        
         @if (!sent) {
-            <div class="space-y-4">
-                <label class="block text-gray-600 font-medium">Email</label>
-                <input
-                    [(ngModel)]="sendCodeForm.email"
-                    type="email"
-                    placeholder="you@example.com"
-                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-                <button
-                    (click)="onSendCode()"
-                    class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
-                >
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="form-label">Email</label>
+                    <div class="relative">
+                        <svg lucideMail class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></svg>
+                        <input
+                            [(ngModel)]="sendCodeForm.email"
+                            type="email"
+                            placeholder="you@example.com"
+                            class="input-field input-field--icon"
+                        />
+                    </div>
+                </div>
+                <button (click)="onSendCode()" class="btn-primary w-full">
                     Send code
                 </button>
             </div>
         }
 
-        <!-- Code input -->
         @if (sent) {
-            <div class="space-y-4">
-                <label class="block text-gray-600 font-medium">Verification code</label>
-                <input
-                    [(ngModel)]="verifyCodeForm.code"
-                    type="text"
-                    placeholder="code"
-                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none tracking-widest text-center text-lg font-mono"
-                />
-                <button
-                    (click)="onVerify()"
-                    class="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition"
-                >
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="form-label">Verification code</label>
+                    <input
+                        [(ngModel)]="verifyCodeForm.code"
+                        type="text"
+                        placeholder="code"
+                        class="input-field tracking-widest text-center text-lg font-mono"
+                    />
+                </div>
+                <button (click)="onVerify()" class="btn-primary w-full">
                     Confirm
                 </button>
 
                 <p class="text-sm text-gray-500 text-center mt-2">
                     Did not receive code?
-                    <a (click)="onSendCode()" class="text-blue-600 cursor-pointer hover:underline">
+                    <a (click)="onSendCode()" class="font-medium text-primary-600 hover:text-primary-700 hover:underline cursor-pointer transition-colors duration-200">
                         Send again
                     </a>
                 </p>
             </div>
         }
-        
-        <!-- Message -->
+
         @if (message) {
-            <p class="mt-6 text-center text-gray-700 font-medium">
-                {{ message }}
-            </p>
+            <div [class]="messageType() === 'error' ? 'alert-error' : 'alert-success'" class="mt-6 text-left">
+                @if (messageType() === 'error') {
+                    <svg lucideCircleAlert class="w-4 h-4 mt-0.5 shrink-0"></svg>
+                } @else {
+                    <svg lucideCircleCheck class="w-4 h-4 mt-0.5 shrink-0"></svg>
+                }
+                <span>{{ message }}</span>
+            </div>
         }
     </div>
-</div>
+</section>

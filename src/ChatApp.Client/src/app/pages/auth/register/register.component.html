@@ -1,91 +1,125 @@
-<section class="bg-gray-50 dark:bg-gray-900">
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-            <img class="w-8 h-8 mr-2" src="" alt="logo" />
-            Chat App    
+<section class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-10">
+    <div class="flex flex-col items-center w-full">
+        <a routerLink="/login" class="flex items-center gap-2 mb-6 text-xl font-bold text-gray-900">
+            <span class="flex items-center justify-center w-9 h-9 rounded-xl bg-primary-600 text-white shadow-soft">
+                <svg lucideMessageCircle class="w-5 h-5"></svg>
+            </span>
+            Chat App
         </a>
-        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                    Register
-                </h1>
-                <form class="space-y-4 md:space-y-6" [formGroup]="form" (ngSubmit)="onSubmit()">
-                    <div>
-                        <label 
-                            for="username" 
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                        >
-                            UserName
-                        </label>
-                        <input 
-                            type="text" 
-                            formControlName="username" 
-                            id="username" 
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <label 
-                            for="email" 
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                        >
-                            Email
-                        </label>
-                        <input 
-                            type="email" 
-                            formControlName="email" 
-                            id="email" 
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="name@company.com" 
-                        />
-                    </div>
-                    <div>
-                        <label 
-                            for="password" 
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                        >
-                            Password
-                        </label>
-                        <input 
-                            type="password" 
-                            formControlName="password" 
-                            id="password" 
-                            placeholder="••••••••" 
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                        />
-                    </div>
-                    <div>
-                        <label 
-                            for="avatar" 
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                        >
-                            Avatar
-                        </label>
-                        <input 
-                            type="file" 
+
+        <div class="auth-card">
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-1">
+                Create your account
+            </h1>
+            <p class="text-sm text-gray-500 mb-6">
+                Join and start chatting in seconds
+            </p>
+
+            <form class="space-y-5" [formGroup]="form" (ngSubmit)="onSubmit()">
+                <div class="flex justify-center">
+                    <label for="avatar" class="relative cursor-pointer group">
+                        <div class="w-20 h-20 rounded-full bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center shadow-sm transition-shadow duration-200 group-hover:shadow-soft">
+                            @if (avatarPreviewUrl()) {
+                                <img [src]="avatarPreviewUrl()" alt="Avatar preview" class="w-full h-full object-cover" />
+                            } @else {
+                                <svg lucideCamera class="w-6 h-6 text-gray-400"></svg>
+                            }
+                        </div>
+                        <span class="absolute bottom-0 right-0 flex items-center justify-center w-7 h-7 rounded-full bg-primary-600 text-white shadow-soft ring-2 ring-white transition-colors duration-200 group-hover:bg-primary-700">
+                            <svg lucideCamera class="w-3.5 h-3.5"></svg>
+                        </span>
+                        <input
+                            type="file"
                             formControlName="avatar"
                             id="avatar"
-                            (change)="onFileSelected($event)" 
+                            (change)="onFileSelected($event)"
                             accept="image/*"
+                            class="sr-only"
+                        />
+                    </label>
+                </div>
+
+                <div>
+                    <label for="username" class="form-label">
+                        Username
+                    </label>
+                    <div class="relative">
+                        <svg lucideUser class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></svg>
+                        <input
+                            type="text"
+                            formControlName="username"
+                            id="username"
+                            autocomplete="username"
+                            class="input-field input-field--icon"
+                            placeholder="janedoe"
                         />
                     </div>
-                    <button 
-                        type="submit" 
-                        class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                    >
-                        Create an account
-                    </button>
-                    <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                        Already have an account? 
-                        <a 
-                            routerLink="/login" 
-                            class="font-medium text-primary-600 hover:underline dark:text-primary-500"
+                </div>
+                <div>
+                    <label for="email" class="form-label">
+                        Email
+                    </label>
+                    <div class="relative">
+                        <svg lucideMail class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></svg>
+                        <input
+                            type="email"
+                            formControlName="email"
+                            id="email"
+                            autocomplete="email"
+                            class="input-field input-field--icon"
+                            placeholder="name@company.com"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label for="password" class="form-label">
+                        Password
+                    </label>
+                    <div class="relative">
+                        <svg lucideLock class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></svg>
+                        <input
+                            [type]="showPassword() ? 'text' : 'password'"
+                            formControlName="password"
+                            id="password"
+                            autocomplete="new-password"
+                            placeholder="••••••••"
+                            class="input-field input-field--icon pr-10"
+                        />
+                        <button
+                            type="button"
+                            (click)="showPassword.set(!showPassword())"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                         >
-                            Login
-                        </a>
-                    </p>
-                </form>
-            </div>
+                            @if (showPassword()) {
+                                <svg lucideEyeOff class="w-4 h-4"></svg>
+                            } @else {
+                                <svg lucideEye class="w-4 h-4"></svg>
+                            }
+                        </button>
+                    </div>
+                </div>
+
+                @if (error) {
+                    <div class="alert-error">
+                        <svg lucideCircleAlert class="w-4 h-4 mt-0.5 shrink-0"></svg>
+                        <span>{{ error }}</span>
+                    </div>
+                }
+
+                <button type="submit" class="btn-primary w-full">
+                    Create an account
+                </button>
+
+                <p class="text-sm text-center text-gray-500">
+                    Already have an account?
+                    <a
+                        routerLink="/login"
+                        class="font-medium text-primary-600 hover:text-primary-700 hover:underline transition-colors duration-200"
+                    >
+                        Login
+                    </a>
+                </p>
+            </form>
         </div>
     </div>
 </section>
