@@ -1,17 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@core/services';
 import { LoginForm } from '../auth.models';
-import { LucideUser, LucideLock, LucideEye, LucideEyeOff, LucideMessageCircle, LucideCircleAlert } from '@lucide/angular';
+import { LucideUser, LucideLock, LucideMessageCircle } from '@lucide/angular';
+import { TextFieldComponent } from '@shared/components';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, RouterModule,
-    LucideUser, LucideLock, LucideEye, LucideEyeOff, LucideMessageCircle, LucideCircleAlert
+    CommonModule, ReactiveFormsModule, RouterModule, TextFieldComponent,
+    LucideUser, LucideLock, LucideMessageCircle
   ],
   templateUrl: './login.component.html'
 })
@@ -20,8 +21,6 @@ export class LoginComponent {
     usernameOrEmail: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
   });
-  error = '';
-  showPassword = signal(false);
 
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
@@ -33,8 +32,7 @@ export class LoginComponent {
     }
 
     this.authService.login(this.form.value as LoginForm).subscribe({
-      next: () => this.router.navigate(['/chat']),
-      error: err => this.error = err.error?.message || 'Login failed'
+      next: () => this.router.navigate(['/chat'])
     });
   }
 }

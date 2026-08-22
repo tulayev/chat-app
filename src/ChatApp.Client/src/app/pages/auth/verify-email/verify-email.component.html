@@ -9,41 +9,41 @@
             {{ sent ? 'Enter the verification code' : 'Verify your email' }}
         </h1>
         <p class="text-sm text-gray-500 mb-6">
-            {{ sent ? 'We sent a code to ' + sendCodeForm.email : 'We will send a one-time code to your inbox' }}
+            {{ sent ? 'We sent a code to ' + sendCodeForm.value.email : 'We will send a one-time code to your inbox' }}
         </p>
 
         @if (!sent) {
-            <div class="space-y-4 text-left">
+            <form class="space-y-4 text-left" [formGroup]="sendCodeForm" (ngSubmit)="onSendCode()">
                 <div>
-                    <label class="form-label">Email</label>
-                    <div class="relative">
-                        <svg lucideMail class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></svg>
-                        <input
-                            [(ngModel)]="sendCodeForm.email"
-                            type="email"
-                            placeholder="you@example.com"
-                            class="input-field input-field--icon"
-                        />
-                    </div>
+                    <app-text-field
+                        label="Email"
+                        id="email"
+                        type="email"
+                        formControlName="email"
+                        placeholder="you@example.com"
+                    >
+                        <svg lucideMail icon class="w-4 h-4"></svg>
+                    </app-text-field>
                 </div>
-                <button (click)="onSendCode()" class="btn-primary w-full">
+                <button type="submit" class="btn-primary w-full">
                     Send code
                 </button>
-            </div>
+            </form>
         }
 
         @if (sent) {
-            <div class="space-y-4 text-left">
+            <form class="space-y-4 text-left" [formGroup]="verifyCodeForm" (ngSubmit)="onVerify()">
                 <div>
-                    <label class="form-label">Verification code</label>
-                    <input
-                        [(ngModel)]="verifyCodeForm.code"
-                        type="text"
+                    <app-text-field
+                        label="Verification code"
+                        id="code"
+                        formControlName="code"
                         placeholder="code"
-                        class="input-field tracking-widest text-center text-lg font-mono"
+                        [icon]="false"
+                        inputClass="tracking-widest text-center text-lg font-mono"
                     />
                 </div>
-                <button (click)="onVerify()" class="btn-primary w-full">
+                <button type="submit" class="btn-primary w-full">
                     Confirm
                 </button>
 
@@ -53,7 +53,7 @@
                         Send again
                     </a>
                 </p>
-            </div>
+            </form>
         }
 
         @if (message) {

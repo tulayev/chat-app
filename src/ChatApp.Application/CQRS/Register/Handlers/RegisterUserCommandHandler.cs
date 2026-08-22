@@ -30,12 +30,12 @@ namespace ChatApp.Application.CQRS.Register.Handlers
         {
             var request = command.RegisterRequestDto;
 
-            if (await _userManager.Users.AnyAsync(x => x.UserName == request.Username))
+            if (await _userManager.Users.AnyAsync(x => x.UserName == request.Username, cancellationToken))
             {
                 return ApiResponse<AuthUserDto>.Fail("UserName is already taken.");
             }
 
-            if (await _userManager.Users.AnyAsync(x => x.Email == request.Email))
+            if (await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken))
             {
                 return ApiResponse<AuthUserDto>.Fail("Email is already in use.");
             }

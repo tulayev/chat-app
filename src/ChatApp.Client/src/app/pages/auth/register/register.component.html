@@ -37,74 +37,44 @@
                             class="sr-only"
                         />
                     </label>
+                    <app-field-error [control]="form.controls.avatar" />
                 </div>
 
                 <div>
-                    <label for="username" class="form-label">
-                        Username
-                    </label>
-                    <div class="relative">
-                        <svg lucideUser class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></svg>
-                        <input
-                            type="text"
-                            formControlName="username"
-                            id="username"
-                            autocomplete="username"
-                            class="input-field input-field--icon"
-                            placeholder="janedoe"
-                        />
-                    </div>
+                    <app-text-field
+                        label="Username"
+                        id="username"
+                        formControlName="username"
+                        autocomplete="username"
+                        placeholder="janedoe"
+                    >
+                        <svg lucideUser icon class="w-4 h-4"></svg>
+                    </app-text-field>
                 </div>
                 <div>
-                    <label for="email" class="form-label">
-                        Email
-                    </label>
-                    <div class="relative">
-                        <svg lucideMail class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></svg>
-                        <input
-                            type="email"
-                            formControlName="email"
-                            id="email"
-                            autocomplete="email"
-                            class="input-field input-field--icon"
-                            placeholder="name@company.com"
-                        />
-                    </div>
+                    <app-text-field
+                        label="Email"
+                        id="email"
+                        type="email"
+                        formControlName="email"
+                        autocomplete="email"
+                        placeholder="name@company.com"
+                    >
+                        <svg lucideMail icon class="w-4 h-4"></svg>
+                    </app-text-field>
                 </div>
                 <div>
-                    <label for="password" class="form-label">
-                        Password
-                    </label>
-                    <div class="relative">
-                        <svg lucideLock class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></svg>
-                        <input
-                            [type]="showPassword() ? 'text' : 'password'"
-                            formControlName="password"
-                            id="password"
-                            autocomplete="new-password"
-                            placeholder="••••••••"
-                            class="input-field input-field--icon pr-10"
-                        />
-                        <button
-                            type="button"
-                            (click)="showPassword.set(!showPassword())"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                        >
-                            @if (showPassword()) {
-                                <svg lucideEyeOff class="w-4 h-4"></svg>
-                            } @else {
-                                <svg lucideEye class="w-4 h-4"></svg>
-                            }
-                        </button>
-                    </div>
+                    <app-text-field
+                        label="Password"
+                        id="password"
+                        type="password"
+                        formControlName="password"
+                        autocomplete="new-password"
+                        placeholder="••••••••"
+                    >
+                        <svg lucideLock icon class="w-4 h-4"></svg>
+                    </app-text-field>
                 </div>
-
-                @if (error) {
-                    <div class="alert-error">
-                        <svg lucideCircleAlert class="w-4 h-4 mt-0.5 shrink-0"></svg>
-                        <span>{{ error }}</span>
-                    </div>
-                }
 
                 <button type="submit" class="btn-primary w-full">
                     Create an account

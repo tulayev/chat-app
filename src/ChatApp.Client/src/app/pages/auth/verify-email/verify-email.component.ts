@@ -1,24 +1,28 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EmailVerificationService } from '@app/core/services';
 import { SendCodeForm, VerifyCodeForm } from '../auth.models';
 import { LucideMail, LucideKeyRound, LucideCircleCheck, LucideCircleAlert } from '@lucide/angular';
+import { TextFieldComponent } from '@shared/components';
 
 @Component({
   selector: 'app-verify-email',
-  imports: [CommonModule, FormsModule, RouterModule, LucideMail, LucideKeyRound, LucideCircleCheck, LucideCircleAlert],
+  imports: [
+    CommonModule, ReactiveFormsModule, RouterModule, TextFieldComponent,
+    LucideMail, LucideKeyRound, LucideCircleCheck, LucideCircleAlert
+  ],
   templateUrl: './verify-email.component.html'
 })
 export class VerifyEmail {
-  sendCodeForm: SendCodeForm = {
-    email: ''
-  };
-  verifyCodeForm: VerifyCodeForm = {
-    email: '',
-    code: ''
-  };
+  sendCodeForm = new FormGroup({
+    email: new FormControl('', [Validators.required, Validators.email])
+  });
+  verifyCodeForm = new FormGroup({
+    email: new FormControl(''),
+    code: new FormControl('', [Validators.required, Validators.pattern(/^\d{6}$/)])
+  });
   message = '';
   messageType = signal<'success' | 'error'>('success');
   sent = false;
@@ -30,21 +34,22 @@ export class VerifyEmail {
   ) {
     this.route.queryParams.subscribe(p => {
       if (p['email']) {
-        this.sendCodeForm.email = p['email'];
+        this.sendCodeForm.patchValue({ email: p['email'] });
       }
     });
   }
 
   onSendCode() {
-    if (!this.sendCodeForm.email) {
+    if (this.sendCodeForm.invalid) {
+      this.sendCodeForm.markAllAsTouched();
       return;
     }
     this.message = '';
 
-    this.auth.sendVerificationCode(this.sendCodeForm).subscribe({
+    this.auth.sendVerificationCode(this.sendCodeForm.value as SendCodeForm).subscribe({
       next: () => {
         this.sent = true;
-        this.verifyCodeForm.email = this.sendCodeForm.email;
+        this.verifyCodeForm.patchValue({ email: this.sendCodeForm.value.email });
         this.messageType.set('success');
         this.message = 'Code sent to you email';
       },
@@ -56,12 +61,13 @@ export class VerifyEmail {
   }
 
   onVerify() {
-    if (!this.verifyCodeForm.code) {
+    if (this.verifyCodeForm.invalid) {
+      this.verifyCodeForm.markAllAsTouched();
       return;
     }
     this.message = '';
 
-    this.auth.verifyEmail(this.verifyCodeForm).subscribe({
+    this.auth.verifyEmail(this.verifyCodeForm.value as VerifyCodeForm).subscribe({
       next: () => {
         this.messageType.set('success');
         this.message = 'Email successfully verified!';

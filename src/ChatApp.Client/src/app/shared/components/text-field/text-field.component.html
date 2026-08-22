@@ -1,0 +1,34 @@
+<label [for]="id" class="form-label">{{ label }}</label>
+<div class="relative">
+    @if (icon) {
+        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+            <ng-content select="[icon]"></ng-content>
+        </span>
+    }
+    <input
+        [id]="id"
+        [type]="inputType"
+        [attr.autocomplete]="autocomplete"
+        [attr.placeholder]="placeholder || null"
+        [disabled]="disabled"
+        [value]="value"
+        (input)="handleInput($event)"
+        (blur)="onTouched()"
+        [class]="'input-field ' + (icon ? 'input-field--icon ' : '') + (type === 'password' ? 'pr-10 ' : '') + inputClass"
+    />
+    @if (type === 'password') {
+        <button
+            type="button"
+            (click)="showPassword.set(!showPassword())"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+            tabindex="-1"
+        >
+            @if (showPassword()) {
+                <svg lucideEyeOff class="w-4 h-4"></svg>
+            } @else {
+                <svg lucideEye class="w-4 h-4"></svg>
+            }
+        </button>
+    }
+</div>
+<app-field-error [control]="control" [messages]="errorMessages" />

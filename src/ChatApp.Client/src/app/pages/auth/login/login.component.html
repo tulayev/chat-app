@@ -17,55 +17,28 @@
 
             <form class="space-y-5" [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div>
-                    <label for="usernameOrEmail" class="form-label">
-                        Username or Email
-                    </label>
-                    <div class="relative">
-                        <svg lucideUser class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></svg>
-                        <input
-                            type="text"
-                            formControlName="usernameOrEmail"
-                            id="usernameOrEmail"
-                            autocomplete="username"
-                            class="input-field input-field--icon"
-                            placeholder="you@example.com"
-                        />
-                    </div>
+                    <app-text-field
+                        label="Username or Email"
+                        id="usernameOrEmail"
+                        formControlName="usernameOrEmail"
+                        autocomplete="username"
+                        placeholder="you@example.com"
+                    >
+                        <svg lucideUser icon class="w-4 h-4"></svg>
+                    </app-text-field>
                 </div>
                 <div>
-                    <label for="password" class="form-label">
-                        Password
-                    </label>
-                    <div class="relative">
-                        <svg lucideLock class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></svg>
-                        <input
-                            [type]="showPassword() ? 'text' : 'password'"
-                            formControlName="password"
-                            id="password"
-                            autocomplete="current-password"
-                            placeholder="••••••••"
-                            class="input-field input-field--icon pr-10"
-                        />
-                        <button
-                            type="button"
-                            (click)="showPassword.set(!showPassword())"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                        >
-                            @if (showPassword()) {
-                                <svg lucideEyeOff class="w-4 h-4"></svg>
-                            } @else {
-                                <svg lucideEye class="w-4 h-4"></svg>
-                            }
-                        </button>
-                    </div>
+                    <app-text-field
+                        label="Password"
+                        id="password"
+                        type="password"
+                        formControlName="password"
+                        autocomplete="current-password"
+                        placeholder="••••••••"
+                    >
+                        <svg lucideLock icon class="w-4 h-4"></svg>
+                    </app-text-field>
                 </div>
-
-                @if (error) {
-                    <div class="alert-error">
-                        <svg lucideCircleAlert class="w-4 h-4 mt-0.5 shrink-0"></svg>
-                        <span>{{ error }}</span>
-                    </div>
-                }
 
                 <button type="submit" class="btn-primary w-full">
                     Login
