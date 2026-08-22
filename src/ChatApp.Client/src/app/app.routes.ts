@@ -4,5 +4,5 @@ import { authGuard } from '@core/guards';
 export const routes: Routes = [
   { path: 'chat', loadChildren: () => import('@pages/chat').then(m => m.CHAT_ROUTES), canActivate: [authGuard] },
   { path: '', loadChildren: () => import('@pages/auth').then(m => m.AUTH_ROUTES) },
-  { path: '**', redirectTo: '' }
+  { path: '**', loadChildren: () => import('@pages/not-found').then(m => m.NOT_FOUND_ROUTES) }
 ];

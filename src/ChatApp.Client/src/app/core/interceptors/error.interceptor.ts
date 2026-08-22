@@ -28,6 +28,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
           case 404:
             toastr.error('Not found', error.status.toString());
+            router.navigateByUrl('/not-found');
             break;
 
           case 500:
