@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@core/services';
 import { LoginForm } from '../auth.models';
@@ -8,22 +8,26 @@ import { LoginForm } from '../auth.models';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html'
 })
 export class LoginComponent {
-  form: LoginForm = {
-    usernameOrEmail: '',
-    password: ''
-  };
+  form = new FormGroup({
+    usernameOrEmai: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
+  });
   error = '';
 
-  constructor(
-    private readonly router: Router,
-    private readonly auth: AuthService) {}
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
   onSubmit(): void {
-    this.auth.login(this.form).subscribe({
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.authService.login(this.form.value as LoginForm).subscribe({
       next: () => this.router.navigate(['/chat']),
       error: err => this.error = err.error?.message || 'Login failed'
     });
