@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ApiResponse, ChatMessage, Message, UserChat } from '@app/models';
 import { AuthService } from '@core/services/auth.service';
 import { environment } from 'environments/environment';
@@ -14,12 +14,10 @@ export class ChatService {
   messages$ = this.messagesSource.asObservable();
   private readonly chatHubUrl = `${environment.baseUrl}/hubs/chat`;
   private readonly apiUrl = `${environment.apiUrl}`;
+  private readonly authService = inject(AuthService);
+  private readonly http = inject(HttpClient);
   private hubConnection!: signalR.HubConnection;
   private rejoinChatId: number | null = null;
-
-  constructor(
-    private readonly auth: AuthService,
-    private readonly http: HttpClient) { }
 
   async start(): Promise<void> {
     if (this.hubConnection && this.hubConnection.state !== signalR.HubConnectionState.Disconnected) {
@@ -28,7 +26,7 @@ export class ChatService {
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(this.chatHubUrl, {
-        accessTokenFactory: () => this.auth.user?.token ?? ''
+        accessTokenFactory: () => this.authService.user?.token ?? ''
       })
       .withAutomaticReconnect()
       .build();

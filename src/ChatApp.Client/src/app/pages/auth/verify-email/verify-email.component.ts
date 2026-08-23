@@ -6,8 +6,7 @@ import { EmailVerificationService } from '@app/core/services';
 import { SendCodeForm, VerifyCodeForm } from '../auth.models';
 import { LucideMail, LucideKeyRound, LucideCircleCheck, LucideCircleAlert } from '@lucide/angular';
 import { TextFieldComponent } from '@shared/components';
-import { Destroy } from '@core/utils';
-import { takeUntil } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-verify-email',
@@ -15,8 +14,7 @@ import { takeUntil } from 'rxjs';
     CommonModule, ReactiveFormsModule, RouterModule, TextFieldComponent,
     LucideMail, LucideKeyRound, LucideCircleCheck, LucideCircleAlert
   ],
-  templateUrl: './verify-email.component.html',
-  providers: [Destroy]
+  templateUrl: './verify-email.component.html'
 })
 export class VerifyEmail implements OnDestroy {
   sendCodeForm = new FormGroup({
@@ -34,13 +32,12 @@ export class VerifyEmail implements OnDestroy {
   private readonly emailVerificationService = inject(EmailVerificationService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly destroy$ = inject(Destroy);
 
   constructor() {
-    this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$))
-      .subscribe(p => {
-        if (p['email']) {
-          this.sendCodeForm.patchValue({ email: p['email'] });
+    this.activatedRoute.queryParams.pipe(takeUntilDestroyed())
+      .subscribe(queryParams => {
+        if (queryParams['email']) {
+          this.sendCodeForm.patchValue({ email: queryParams['email'] });
         }
       });
   }

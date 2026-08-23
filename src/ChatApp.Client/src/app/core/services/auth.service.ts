@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ApiResponse, AuthUser } from '@app/models';
 import { environment } from 'environments/environment';
 import { LoginForm, RegisterForm } from '@pages/auth';
@@ -10,8 +10,7 @@ import { Observable, tap } from 'rxjs';
 })
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/auth`;
-
-  constructor(private readonly http: HttpClient) { }
+  private readonly http = inject(HttpClient);
 
   get user(): AuthUser | null {
     const user = localStorage.getItem('user');

@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { User, UserChat } from '@app/models';
 import { AuthService, ChatService } from '@core/services';
-import { Destroy } from '@core/utils';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EMPTY, map, Observable, switchMap, takeUntil } from 'rxjs';
+import { EMPTY, map, Observable, switchMap } from 'rxjs';
 import {
   LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut
 } from '@lucide/angular';
@@ -18,15 +18,14 @@ import { AvatarComponent } from '@shared/components';
     FormsModule, CommonModule, AvatarComponent,
     LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut
   ],
-  templateUrl: './chat.component.html',
-  providers: [Destroy]
+  templateUrl: './chat.component.html'
 })
 export class ChatComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly chatService = inject(ChatService);
-  private readonly destroy$ = inject(Destroy);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly currentUser = this.authService.user;
   readonly chatMessages$ = this.chatService.messages$;
@@ -47,7 +46,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     this.activatedRoute.paramMap
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         map(params => params.get('userId')),
         switchMap(userId => {
           if (!userId || isNaN(Number(userId))) {

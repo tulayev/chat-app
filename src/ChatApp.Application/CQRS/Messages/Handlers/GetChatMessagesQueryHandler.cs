@@ -49,7 +49,8 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
 
-            var contact = await _unitOfWork.GetQueryable<AppUser>().FirstAsync(x => x.Id == receiverUserId, cancellationToken);
+            var contact = await _unitOfWork.GetQueryable<AppUser>()
+                .FirstAsync(x => x.Id == receiverUserId, cancellationToken);
             var contactDto = _mapper.Map<UserDto>(contact);
 
             var messages = await _unitOfWork.GetQueryable<Chat>()
