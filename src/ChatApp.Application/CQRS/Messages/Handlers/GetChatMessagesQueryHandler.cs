@@ -1,6 +1,8 @@
-﻿using ChatApp.Application.Common.Interfaces.Repositories;
+using ChatApp.Application.Common.Interfaces.Repositories;
 using ChatApp.Application.CQRS.Messages.Queries;
+using ChatApp.Application.DTOs.Chat;
 using ChatApp.Application.DTOs.Message;
+using ChatApp.Application.DTOs.User;
 using ChatApp.Application.Helpers;
 using ChatApp.Domain.Models;
 using Mapster;
@@ -10,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Application.CQRS.Messages.Handlers
 {
-    public class GetChatMessagesQueryHandler : IRequestHandler<GetChatMessagesQuery, ApiResponse<IReadOnlyCollection<MessageDto>>>
+    public class GetChatMessagesQueryHandler : IRequestHandler<GetChatMessagesQuery, ApiResponse<ChatMessagesDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -21,14 +23,14 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
             _mapper = mapper;
         }
 
-        public async Task<ApiResponse<IReadOnlyCollection<MessageDto>>> Handle(GetChatMessagesQuery query, CancellationToken cancellationToken)
+        public async Task<ApiResponse<ChatMessagesDto>> Handle(GetChatMessagesQuery query, CancellationToken cancellationToken)
         {
             var currentUserId = query.CurrentUserId;
             var receiverUserId = query.UserId;
 
             if (currentUserId == receiverUserId)
             {
-                return ApiResponse<IReadOnlyCollection<MessageDto>>.Fail("You cannot chat with yourself!");
+                return ApiResponse<ChatMessagesDto>.Fail("You cannot chat with yourself!");
             }
 
             var chat = await _unitOfWork.GetQueryable<Chat>().FirstOrDefaultAsync(x =>
@@ -47,14 +49,16 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
 
+            var contact = await _unitOfWork.GetQueryable<AppUser>().FirstAsync(x => x.Id == receiverUserId, cancellationToken);
+            var contactDto = _mapper.Map<UserDto>(contact);
+
             var messages = await _unitOfWork.GetQueryable<Chat>()
                 .Where(x => x.Id == chat.Id)
                 .SelectMany(x => x.Messages)
-                .Select(x => new MessageDto()
-                //.ProjectToType<MessageDto>(_mapper.Config)
+                .ProjectToType<MessageDto>(_mapper.Config)
                 .ToListAsync(cancellationToken);
 
-            return ApiResponse<IReadOnlyCollection<MessageDto>>.Ok(messages);
+            return ApiResponse<ChatMessagesDto>.Ok(new ChatMessagesDto(chat.Id, contactDto, messages));
         }
     }
 }

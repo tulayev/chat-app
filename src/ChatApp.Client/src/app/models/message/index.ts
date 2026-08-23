@@ -7,10 +7,3 @@ export interface Message {
   sender: User;
   receiver: User;
 }
-
-export interface SendMessage {
-  id: number;
-  senderId: number;
-  content: string;
-  sentAt: Date;
-}

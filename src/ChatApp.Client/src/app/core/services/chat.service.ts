@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiResponse, UserChat, Message } from '@app/models';
+import { ApiResponse, ChatMessages, Message, UserChat } from '@app/models';
 import { AuthService } from '@core/services/auth.service';
 import { environment } from 'environments/environment';
 import * as signalR from '@microsoft/signalr';
@@ -61,10 +61,10 @@ export class ChatService {
     return this.http.get<ApiResponse<UserChat[]>>(`${this.apiUrl}/chat/userchats`);
   }
 
-  loadMessagesWith(userId: number): Observable<ApiResponse<Message[]>> {
-    return this.http.get<ApiResponse<Message[]>>(`${this.apiUrl}/chat/messages/with/${userId}`)
+  loadChatMessages(userId: number): Observable<ApiResponse<ChatMessages>> {
+    return this.http.get<ApiResponse<ChatMessages>>(`${this.apiUrl}/chat/messages/with/${userId}`)
       .pipe(
-        tap(({ data }) => this.messagesSource.next(data))
+        tap(({ data }) => this.messagesSource.next(data.messages))
       );
   }
 

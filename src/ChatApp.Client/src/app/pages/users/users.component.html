@@ -1,5 +1,5 @@
 @if (users$ | async; as users) {
     @for (user of users; track user.id) {
-        <a routerLink="/chat">{{ user.username }}</a>
+        <a [routerLink]="['/chat', user.id]">{{ user.username }}</a>
     }
 }

@@ -1,10 +1,8 @@
 <section class="flex h-screen overflow-hidden bg-gray-100">
-    @let currentChat = currentChat$ | async;
-
     <!-- Sidebar -->
     <aside
         class="flex-col bg-white border-r border-gray-200 w-full md:w-80 lg:w-96 transition-all duration-300 ease-in-out"
-        [class]="(currentChat ? 'hidden' : 'flex') + ' ' + (sidebarCollapsed() ? 'md:hidden' : 'md:flex')"
+        [class]="(mobileView() === 'list' ? 'flex' : 'hidden') + ' ' + (sidebarCollapsed() ? 'md:hidden' : 'md:flex')"
     >
         <!-- Sidebar Header -->
         <header class="p-4 flex justify-between items-center bg-primary-600 text-white shrink-0">
@@ -27,7 +25,7 @@
             @for (userChat of userChats$ | async; track userChat.chatId) {
                 <div
                     class="contact-item"
-                    [class.contact-item-active]="currentChat?.chatId === userChat.chatId"
+                    [class.contact-item-active]="chatId() === userChat.chatId"
                     (click)="onUserChatClick(userChat)"
                 >
                     <app-avatar [src]="userChat.contact.avatarUrl" [name]="userChat.contact.username" size="md" />
@@ -59,9 +57,9 @@
     <!-- Main Chat Area -->
     <div
         class="flex-1 flex-col min-w-0"
-        [class]="!currentChat ? 'hidden md:flex' : 'flex'"
+        [class]="mobileView() === 'chat' ? 'flex' : 'hidden md:flex'"
     >
-        @if (currentChat; as chat) {
+        @if (contact(); as chat) {
             <!-- Chat Header -->
             <header class="flex items-center gap-3 border-b border-gray-200 bg-white p-4 shrink-0">
                 <button
@@ -82,23 +80,23 @@
                         <svg lucidePanelLeftOpen class="w-4 h-4"></svg>
                     </button>
                 }
-                <app-avatar [src]="chat.contact.avatarUrl" [name]="chat.contact.username" size="sm" />
-                <h2 class="text-base font-semibold text-gray-900">{{ chat.contact.username }}</h2>
+                <app-avatar [src]="chat.avatarUrl" [name]="chat.username" size="sm" />
+                <h2 class="text-base font-semibold text-gray-900">{{ chat.username }}</h2>
             </header>
 
             <!-- Chat Messages -->
             <div class="flex-1 min-h-0 overflow-y-auto bg-gray-50 p-4 space-y-3">
                 @for (message of chatMessages$ | async; track message.id) {
                     <!-- Incoming Message -->
-                    @if (message.sender && message.sender.id === chat.contact.id) {
+                    @if (message.sender && message.sender.id === chat.id) {
                         <div class="flex items-end gap-2">
-                            <app-avatar [src]="chat.contact.avatarUrl" [name]="chat.contact.username" size="sm" />
+                            <app-avatar [src]="chat.avatarUrl" [name]="chat.username" size="sm" />
                             <div class="chat-bubble-in">
                                 {{ message.content }}
                             </div>
                         </div>
                     }
-                    @if (message.sender && message.sender.id !== chat.contact.id) {
+                    @if (message.sender && message.sender.id !== chat.id) {
                         <!-- Outgoing Message -->
                         <div class="flex items-end justify-end gap-2">
                             <div class="chat-bubble-out">
@@ -131,10 +129,10 @@
                 </div>
             </div>
         } @else {
-            <!-- Empty State -->
+            <!-- Loading State -->
             <div class="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3">
                 <svg lucideMessageCircle class="w-12 h-12"></svg>
-                <p class="text-sm">Select a conversation to start chatting</p>
+                <p class="text-sm">Loading conversation…</p>
             </div>
         }
     </div>

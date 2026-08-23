@@ -1,3 +1,4 @@
+import { Message } from '../message';
 import { User } from '../user';
 
 export interface UserChat {
@@ -5,4 +6,10 @@ export interface UserChat {
   contact: User;
   lastMessage: string | null;
   lastMessageTime: Date | null;
+}
+
+export interface ChatMessages {
+  chatId: number;
+  contact: User;
+  messages: Message[];
 }

@@ -1,14 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Message, UserChat } from '@app/models';
-import { selectCurrentChat } from '@app/store';
-import { Store } from '@ngrx/store';
-import * as ChatActions from '@app/store';
+import { User, UserChat } from '@app/models';
 import { AuthService, ChatService } from '@core/services';
 import { Destroy } from '@core/utils';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, map, Observable, take, takeUntil, tap } from 'rxjs';
+import { filter, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import {
   LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut
 } from '@lucide/angular';
@@ -25,123 +22,84 @@ import { AvatarComponent } from '@shared/components';
   providers: [Destroy]
 })
 export class ChatComponent implements OnInit, OnDestroy {
-  messages$!: Observable<Message[]>;
-  newMessage = '';
-  sidebarCollapsed = signal(false);
-  receiverId = signal(0);
-
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly store = inject(Store);
   private readonly chatService = inject(ChatService);
   private readonly destroy$ = inject(Destroy);
+
   readonly currentUser = this.authService.user;
+  readonly chatMessages$ = this.chatService.messages$;
+
+  userChats$!: Observable<UserChat[]>;
+  contact = signal<User | null>(null);
+  chatId = signal<number | null>(null);
+  mobileView = signal<'list' | 'chat'>('chat');
+  sidebarCollapsed = signal(false);
+  newMessage = '';
 
   async ngOnInit(): Promise<void> {
-    this.activatedRoute.paramMap.subscribe(params => {
-      const userId = params.get('userId');
-      if (!userId) {
-        this.router.navigateByUrl('/not-found');
-        return;
-      }
-
-      this.loadMessages(+userId);
-    });
-
-    // Start SignalR
-    await this.chatService.start();
-
-    // Load Chat Users
     this.userChats$ = this.chatService.loadUserChats().pipe(map(({ data }) => data));
 
-    // Rehydrate saved chat from localStorage
-    const savedChat = localStorage.getItem('currentChat');
-    if (savedChat) {
-      const chat = JSON.parse(savedChat) as UserChat;
-      this.store.dispatch(ChatActions.setCurrentChat({ chat }));
-    }
+    await this.chatService.start();
 
-    // Subscribe to current chat and handle joining/loading
-    this.currentChat$.pipe(
+    this.activatedRoute.paramMap
+      .pipe(
         takeUntil(this.destroy$),
-        filter((chat): chat is UserChat => !!chat),
-        tap(chat => {
-          this.chatService.joinChat(chat.chatId);
-          this.chatService.loadChatMessages(chat.chatId).subscribe();
-          this.chatMessages$ = this.chatService.messages$;
-        })
+        map(params => params.get('userId')),
+        tap(userId => {
+          if (!userId) {
+            this.router.navigateByUrl('/not-found');
+          }
+        }),
+        filter((userId): userId is string => !!userId),
+        switchMap(userId => this.chatService.loadChatMessages(+userId))
       )
-      .subscribe();
-  }
-  loadMessages(receiverId: number) {
-    this.chatService.loadMessagesWith(receiverId)
+      .subscribe(({ data }) => {
+        this.leaveCurrentChat();
+        this.chatId.set(data.chatId);
+        this.contact.set(data.contact);
+        this.mobileView.set('chat');
+        this.chatService.joinChat(data.chatId);
+      });
   }
 
   ngOnDestroy(): void {
-    this.currentChat$
-      .pipe(take(1))
-      .subscribe(current => {
-        if (current?.chatId) {
-          this.chatService.leaveChat(current.chatId);
-        }
-      });
-
+    this.leaveCurrentChat();
     this.chatService.stop();
   }
 
   onUserChatClick(chat: UserChat): void {
-    // Leave previous chat before switching
-    this.currentChat$
-      .pipe(take(1))
-      .subscribe(current => {
-        if (current?.chatId) {
-          this.chatService.leaveChat(current.chatId);
-        }
-      });
-
-    // Select new chat
-    this.store.dispatch(ChatActions.setCurrentChat({ chat }));
+    this.mobileView.set('chat');
+    this.router.navigate(['/chat', chat.contact.id]);
   }
 
   onSendClick(): void {
-    this.currentChat$
-      .pipe(take(1))
-      .subscribe(chat => {
-        if (!chat || !this.newMessage.trim()) {
-          return;
-        }
+    const chatId = this.chatId();
+    if (!chatId || !this.newMessage.trim()) {
+      return;
+    }
 
-        this.chatService
-          .sendPrivateMessage(chat.chatId, this.newMessage)
-          .subscribe(() => (this.newMessage = ''));
-      });
+    this.chatService
+      .sendPrivateMessage(chatId, this.newMessage)
+      .subscribe(() => (this.newMessage = ''));
   }
 
   onBack(): void {
-    this.currentChat$
-      .pipe(take(1))
-      .subscribe(current => {
-        if (current?.chatId) {
-          this.chatService.leaveChat(current.chatId);
-        }
-      });
-
-    this.store.dispatch(ChatActions.clearCurrentChat());
+    this.mobileView.set('list');
   }
 
-  onLogout(): void {
-    this.currentChat$
-      .pipe(take(1))
-      .subscribe(current => {
-        if (current?.chatId) {
-          this.chatService.leaveChat(current.chatId);
-        }
-      });
-
-    this.chatService.stop();
-    this.store.dispatch(ChatActions.clearCurrentChat());
+  async onLogout(): Promise<void> {
+    this.leaveCurrentChat();
+    await this.chatService.stop();
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  private leaveCurrentChat(): void {
+    const chatId = this.chatId();
+    if (chatId) {
+      this.chatService.leaveChat(chatId);
+    }
   }
 }
