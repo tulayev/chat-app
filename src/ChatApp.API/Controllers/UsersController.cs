@@ -1,4 +1,5 @@
-﻿using ChatApp.Application.CQRS.Users.Queries;
+﻿using ChatApp.API.Extensions;
+using ChatApp.Application.CQRS.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace ChatApp.API.Controllers
         [HttpGet("")]
         public async Task<IActionResult> GetUsers()
         {
-            var response = await _mediator.Send(new GetUsersQuery());
+            var response = await _mediator.Send(new GetUsersQuery(User.GetUserId()));
             return HandleResponse(response);
         }
     }

@@ -22,9 +22,10 @@ namespace ChatApp.Application.CQRS.Users.Handlers
             _mapper = mapper;
         }
 
-        public async Task<ApiResponse<IReadOnlyCollection<UserDto>>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<IReadOnlyCollection<UserDto>>> Handle(GetUsersQuery query, CancellationToken cancellationToken)
         {
             var users = await _userManager.Users
+                .Where(x => x.Id != query.CurrentUserId)
                 .ProjectToType<UserDto>(_mapper.Config)
                 .ToListAsync(cancellationToken);
 

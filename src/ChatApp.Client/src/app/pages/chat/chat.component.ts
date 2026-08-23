@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ChatMessage, UserChat } from '@app/models';
+import { Message, UserChat } from '@app/models';
 import { selectCurrentChat } from '@app/store';
 import { Store } from '@ngrx/store';
 import * as ChatActions from '@app/store';
 import { AuthService, ChatService } from '@core/services';
 import { Destroy } from '@core/utils';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { filter, map, Observable, take, takeUntil, tap } from 'rxjs';
 import {
   LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut
@@ -25,24 +25,30 @@ import { AvatarComponent } from '@shared/components';
   providers: [Destroy]
 })
 export class ChatComponent implements OnInit, OnDestroy {
-  userChats$!: Observable<UserChat[]>;
-  chatMessages$!: Observable<ChatMessage[]>;
-  currentChat$!: Observable<UserChat | null>;
+  messages$!: Observable<Message[]>;
   newMessage = '';
   sidebarCollapsed = signal(false);
+  receiverId = signal(0);
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly store = inject(Store);
   private readonly chatService = inject(ChatService);
   private readonly destroy$ = inject(Destroy);
   readonly currentUser = this.authService.user;
 
-  constructor() {
-    this.currentChat$ = this.store.select(selectCurrentChat);
-  }
-
   async ngOnInit(): Promise<void> {
+    this.activatedRoute.paramMap.subscribe(params => {
+      const userId = params.get('userId');
+      if (!userId) {
+        this.router.navigateByUrl('/not-found');
+        return;
+      }
+
+      this.loadMessages(+userId);
+    });
+
     // Start SignalR
     await this.chatService.start();
 
@@ -67,6 +73,9 @@ export class ChatComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe();
+  }
+  loadMessages(receiverId: number) {
+    this.chatService.loadMessagesWith(receiverId)
   }
 
   ngOnDestroy(): void {

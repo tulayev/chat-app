@@ -8,12 +8,12 @@ namespace ChatApp.Application.Mappings
     {
         public void Register(TypeAdapterConfig config)
         {
-            config.NewConfig<Message, ChatMessageDto>()
+            config.NewConfig<Message, MessageDto>()
                 .Map(dest => dest.Id, src => src.Id)
-                .Map(dest => dest.ChatId, src => src.ChatId)
                 .Map(dest => dest.Content, src => src.Content)
                 .Map(dest => dest.SentAt, src => src.SentAt)
-                .Map(dest => dest.Sender, src => src.Sender);
+                .Map(dest => dest.Sender, src => src.Sender)
+                .Map(dest => dest.Receiver, src => src.SenderId == src.Chat.User1Id ? src.Chat.User2 : src.Chat.User1);
         }
     }
 }

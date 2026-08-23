@@ -38,9 +38,18 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
             await _unitOfWork.AddAsync(message);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var user = await _unitOfWork.GetQueryable<AppUser>().FirstOrDefaultAsync(x => x.Id == message.SenderId);
-            var userDto = _mapper.Map<UserDto>(user!);
-            var result = new ChatMessageDto(message.Id, message.ChatId, userDto, message.Content!, message.SentAt);
+            var participants = await _unitOfWork.GetQueryable<Chat>()
+                .Where(x => x.Id == command.ChatId)
+                .Select(x => new
+                {
+                    Sender = x.User1Id == command.SenderId ? x.User1 : x.User2,
+                    Receiver = x.User1Id == command.SenderId ? x.User2 : x.User1
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var senderDto = _mapper.Map<UserDto>(participants!.Sender);
+            var receiverDto = _mapper.Map<UserDto>(participants.Receiver);
+            var result = new MessageDto(message.Id, message.Content!, message.SentAt, senderDto, receiverDto);
 
             // Notify all in this chat
             await _hub.Clients.Group($"chat-{command.ChatId}").SendAsync("ReceiveMessage", result);

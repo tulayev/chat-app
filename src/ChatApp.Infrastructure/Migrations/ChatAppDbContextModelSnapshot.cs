@@ -112,6 +112,16 @@ namespace ChatApp.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("MaxUserId")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("integer")
+                        .HasComputedColumnSql("GREATEST(\"User1Id\", \"User2Id\")", true);
+
+                    b.Property<int>("MinUserId")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("integer")
+                        .HasComputedColumnSql("LEAST(\"User1Id\", \"User2Id\")", true);
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -126,6 +136,10 @@ namespace ChatApp.Infrastructure.Migrations
                     b.HasIndex("User1Id");
 
                     b.HasIndex("User2Id");
+
+                    b.HasIndex("MinUserId", "MaxUserId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Chats_UserPair_Unique");
 
                     b.ToTable("Chats");
                 });

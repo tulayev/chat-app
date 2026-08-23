@@ -4,5 +4,5 @@ using MediatR;
 
 namespace ChatApp.Application.CQRS.Messages.Queries
 {
-    public record GetChatMessagesQuery(int ChatId) : IRequest<ApiResponse<IEnumerable<ChatMessageDto>>>;
+    public record GetChatMessagesQuery(int CurrentUserId, int UserId) : IRequest<ApiResponse<IReadOnlyCollection<MessageDto>>>;
 }

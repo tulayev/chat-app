@@ -1,11 +1,11 @@
 import { User } from '../user';
 
-export interface ChatMessage {
+export interface Message {
   id: number;
-  chatId: number;
-  sender: User;
   content: string;
   sentAt: Date;
+  sender: User;
+  receiver: User;
 }
 
 export interface SendMessage {

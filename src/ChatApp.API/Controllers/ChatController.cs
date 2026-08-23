@@ -24,10 +24,10 @@ namespace ChatApp.API.Controllers
             return HandleResponse(response);
         }
 
-        [HttpGet("{chatId}/messages")]
-        public async Task<IActionResult> GetChatMessages(int chatId)
+        [HttpGet("messages/with/{userId}")]
+        public async Task<IActionResult> GetChatMessages(int userId)
         {
-            var response = await _mediator.Send(new GetChatMessagesQuery(chatId));
+            var response = await _mediator.Send(new GetChatMessagesQuery(User.GetUserId(), userId));
             return HandleResponse(response);
         }
 

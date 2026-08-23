@@ -30,54 +30,6 @@ namespace ChatApp.Infrastructure.Data.Seed
             }
         }
 
-        public static async Task SeedChats(ChatAppDbContext db, IHostEnvironment env)
-        {
-            if (await db.Chats.AnyAsync())
-            {
-                return;
-            }
-
-            var filePath = Path.Combine(GetSeedFolder(env), "seed_chats.json");
-            var chatData = await File.ReadAllTextAsync(filePath);
-            var chats = JsonSerializer.Deserialize<List<Chat>>(chatData);
-
-            if (chats == null)
-            {
-                return;
-            }
-
-            await db.Chats.AddRangeAsync(chats);
-
-            if (db.ChangeTracker.HasChanges())
-            {
-                await db.SaveChangesAsync();
-            }
-        }
-
-        public static async Task SeedMessages(ChatAppDbContext db, IHostEnvironment env)
-        {
-            if (await db.Messages.AnyAsync())
-            {
-                return;
-            }
-
-            var filePath = Path.Combine(GetSeedFolder(env), "seed_messages.json");
-            var messageData = await File.ReadAllTextAsync(filePath);
-            var messages = JsonSerializer.Deserialize<List<Message>>(messageData);
-
-            if (messages == null)
-            {
-                return;
-            }
-
-            await db.Messages.AddRangeAsync(messages);
-
-            if (db.ChangeTracker.HasChanges())
-            {
-                await db.SaveChangesAsync();
-            }
-        }
-
         private static string GetSeedFolder(IHostEnvironment env)
         {
             if (env.IsDevelopment())

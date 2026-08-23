@@ -4,5 +4,5 @@ using MediatR;
 
 namespace ChatApp.Application.CQRS.Users.Queries
 {
-    public record GetUsersQuery() : IRequest<ApiResponse<IReadOnlyCollection<UserDto>>>;
+    public record GetUsersQuery(int CurrentUserId) : IRequest<ApiResponse<IReadOnlyCollection<UserDto>>>;
 }

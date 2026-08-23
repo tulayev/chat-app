@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiResponse, UserChat, ChatMessage } from '@app/models';
+import { ApiResponse, UserChat, Message } from '@app/models';
 import { AuthService } from '@core/services/auth.service';
 import { environment } from 'environments/environment';
 import * as signalR from '@microsoft/signalr';
@@ -10,7 +10,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class ChatService {
-  private messagesSource = new BehaviorSubject<ChatMessage[]>([]);
+  private messagesSource = new BehaviorSubject<Message[]>([]);
   messages$ = this.messagesSource.asObservable();
   private readonly chatHubUrl = `${environment.baseUrl}/hubs/chat`;
   private readonly apiUrl = `${environment.apiUrl}`;
@@ -33,7 +33,7 @@ export class ChatService {
       .withAutomaticReconnect()
       .build();
 
-    this.hubConnection.on('ReceiveMessage', (message: ChatMessage) => {
+    this.hubConnection.on('ReceiveMessage', (message: Message) => {
       const current = this.messagesSource.value;
       this.messagesSource.next([...current, message]);
     });
@@ -61,8 +61,8 @@ export class ChatService {
     return this.http.get<ApiResponse<UserChat[]>>(`${this.apiUrl}/chat/userchats`);
   }
 
-  loadChatMessages(chatId: number): Observable<ApiResponse<ChatMessage[]>> {
-    return this.http.get<ApiResponse<ChatMessage[]>>(`${this.apiUrl}/chat/${chatId}/messages`)
+  loadMessagesWith(userId: number): Observable<ApiResponse<Message[]>> {
+    return this.http.get<ApiResponse<Message[]>>(`${this.apiUrl}/chat/messages/with/${userId}`)
       .pipe(
         tap(({ data }) => this.messagesSource.next(data))
       );

@@ -19,6 +19,16 @@ namespace ChatApp.Infrastructure.Data.Configurations
                 .WithMany()
                 .HasForeignKey(x => x.User2Id)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property<int>("MinUserId")
+                .HasComputedColumnSql("LEAST(\"User1Id\", \"User2Id\")", stored: true);
+
+            builder.Property<int>("MaxUserId")
+                .HasComputedColumnSql("GREATEST(\"User1Id\", \"User2Id\")", stored: true);
+
+            builder.HasIndex("MinUserId", "MaxUserId")
+                .IsUnique()
+                .HasDatabaseName("IX_Chats_UserPair_Unique");
         }
     }
 }
