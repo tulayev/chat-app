@@ -1,6 +1,7 @@
 ﻿using ChatApp.Application.Common.Interfaces.Repositories;
 using ChatApp.Application.CQRS.Messages.Queries;
 using ChatApp.Application.DTOs.Chat;
+using ChatApp.Application.DTOs.User;
 using ChatApp.Application.Helpers;
 using ChatApp.Domain.Models;
 using MapsterMapper;
@@ -25,18 +26,25 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
             var userId = request.CurrentUserId;
 
             var chats = await _unitOfWork.GetQueryable<Chat>()
-                .Include(c => c.User1)
-                .Include(c => c.User2)
-                .Include(c => c.Messages)
+                .AsNoTracking()
                 .Where(c => c.User1Id == userId || c.User2Id == userId)
+                .OrderByDescending(c => c.Messages.OrderByDescending(x => x.SentAt).Select(x => x.SentAt).FirstOrDefault())
+                .Select(x => new ChatDto
+                (
+                    x.Id,
+                    new UserDto
+                    (
+                        userId == x.User1Id ? x.User2Id : x.User1Id,
+                        userId == x.User1Id ? x.User2.UserName! : x.User1.UserName!,
+                        userId == x.User1Id ? x.User2.Email! : x.User1.Email!,
+                        userId == x.User1Id ? x.User2.AvatarUrl! : x.User1.AvatarUrl!
+                    ),
+                    x.Messages.OrderByDescending(x => x.SentAt).Select(x => x.Content).FirstOrDefault(),
+                    x.Messages.OrderByDescending(x => x.SentAt).Select(x => x.SentAt).FirstOrDefault()
+                ))
                 .ToListAsync(cancellationToken);
 
-            var result = chats
-                .Select(chat => _mapper.Map<(Chat chat, int currentUserId), ChatDto>((chat, userId)))
-                .OrderByDescending(x => x.LastMessageTime)
-                .ToList();
-
-            return ApiResponse<IEnumerable<ChatDto>>.Ok(result);
+            return ApiResponse<IEnumerable<ChatDto>>.Ok(chats);
         }
     }
 }

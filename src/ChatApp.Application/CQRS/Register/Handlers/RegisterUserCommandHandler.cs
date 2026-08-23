@@ -7,6 +7,7 @@ using ChatApp.Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace ChatApp.Application.CQRS.Register.Handlers
 {
@@ -15,15 +16,18 @@ namespace ChatApp.Application.CQRS.Register.Handlers
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IImageStoreService _imageStoreService;
+        private readonly ILogger<RegisterUserCommandHandler> _logger;
 
         public RegisterUserCommandHandler(
             UserManager<AppUser> userManager,
             IJwtTokenService jwtTokenService,
-            IImageStoreService imageStoreService)
+            IImageStoreService imageStoreService,
+            ILogger<RegisterUserCommandHandler> logger)
         {
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
             _imageStoreService = imageStoreService;
+            _logger = logger;
         }
 
         public async Task<ApiResponse<AuthUserDto>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
@@ -65,6 +69,9 @@ namespace ChatApp.Application.CQRS.Register.Handlers
             var token = _jwtTokenService.CreateToken(user);
 
             var response = new AuthUserDto(user.Id, token, user.UserName!, user.Email!, user.AvatarUrl);
+
+            _logger.LogInformation($"New user with username: {user.UserName} has registered!");
+
             return ApiResponse<AuthUserDto>.Ok(response);
         }
     }

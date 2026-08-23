@@ -32,7 +32,7 @@ export class LoginComponent {
     }
 
     this.authService.login(this.form.value as LoginForm).subscribe({
-      next: () => this.router.navigate(['/chat'])
+      next: () => this.router.navigate(['/users'])
     });
   }
 }

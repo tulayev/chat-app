@@ -1,7 +1,9 @@
 ﻿using NLog;
+using NLog.Conditions;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
+using NLog.Targets.Wrappers;
 
 namespace ChatApp.API.Extensions
 {
@@ -26,25 +28,30 @@ namespace ChatApp.API.Extensions
                 Layout = "${date:format=yyyy-MM-dd HH\\:mm\\:ss} | ${level:uppercase=true} | ${logger} | ${message} ${exception}"
             };
 
-            logConfig.AddRule(NLog.LogLevel.Info, NLog.LogLevel.Fatal, logfile);
-            
             var logconsole = new ColoredConsoleTarget("logconsole")
             {
                 Layout = "${date:format=yyyy-MM-dd HH\\:mm\\:ss} | ${level:uppercase=true} | ${logger} | ${message} ${exception}"
             };
 
-            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("INFO", ConsoleOutputColor.Green, ConsoleOutputColor.NoChange));
-            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("WARN", ConsoleOutputColor.Yellow, ConsoleOutputColor.NoChange));
-            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("ERROR", ConsoleOutputColor.Red, ConsoleOutputColor.NoChange));
-            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("FATAL", ConsoleOutputColor.DarkRed, ConsoleOutputColor.NoChange));
+            logconsole.UseDefaultRowHighlightingRules = false;
+            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("FATAL", ConsoleOutputColor.White, ConsoleOutputColor.Red) { WholeWords = true });
+            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("ERROR", ConsoleOutputColor.Red, ConsoleOutputColor.NoChange) { WholeWords = true });
+            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("WARN", ConsoleOutputColor.Yellow, ConsoleOutputColor.NoChange) { WholeWords = true });
+            logconsole.WordHighlightingRules.Add(new ConsoleWordHighlightingRule("INFO", ConsoleOutputColor.Green, ConsoleOutputColor.NoChange) { WholeWords = true });
 
+            // Keep the log file free of framework noise (ASP.NET Core, EF Core, etc.) below Warning,
+            // while the console still shows everything Info+ so the app looks alive during development.
+            var filteredLogfile = new FilteringTargetWrapper(logfile, ConditionParser.ParseExpression(
+                "not (starts-with(logger, 'Microsoft.') or starts-with(logger, 'System.')) or level >= LogLevel.Warn"));
+
+            logConfig.AddRule(NLog.LogLevel.Info, NLog.LogLevel.Fatal, filteredLogfile);
             logConfig.AddRule(NLog.LogLevel.Info, NLog.LogLevel.Fatal, logconsole);
 
             LogManager.Configuration = logConfig;
 
             // Add NLog as Logger
             loggingBuilder.ClearProviders();
-            loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+            loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
             loggingBuilder.AddNLog(logConfig);
 
             return loggingBuilder;
