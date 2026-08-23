@@ -5,7 +5,7 @@ import { User, UserChat } from '@app/models';
 import { AuthService, ChatService } from '@core/services';
 import { Destroy } from '@core/utils';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { EMPTY, map, Observable, switchMap, takeUntil } from 'rxjs';
 import {
   LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut
 } from '@lucide/angular';
@@ -38,29 +38,34 @@ export class ChatComponent implements OnInit, OnDestroy {
   sidebarCollapsed = signal(false);
   newMessage = '';
 
-  async ngOnInit(): Promise<void> {
-    this.userChats$ = this.chatService.loadUserChats().pipe(map(({ data }) => data));
+  ngOnInit(): void {
+    this.userChats$ = this.chatService.getUserChats().pipe(
+      map(response => response.data)
+    );
 
-    await this.chatService.start();
+    const hubReady = this.chatService.start();
 
     this.activatedRoute.paramMap
       .pipe(
         takeUntil(this.destroy$),
         map(params => params.get('userId')),
-        tap(userId => {
-          if (!userId) {
+        switchMap(userId => {
+          if (!userId || isNaN(Number(userId))) {
             this.router.navigateByUrl('/not-found');
+            return EMPTY;
           }
-        }),
-        filter((userId): userId is string => !!userId),
-        switchMap(userId => this.chatService.loadChatMessages(+userId))
+          
+          return this.chatService.getChatMessages(+userId);
+        })
       )
       .subscribe(({ data }) => {
         this.leaveCurrentChat();
         this.chatId.set(data.chatId);
         this.contact.set(data.contact);
         this.mobileView.set('chat');
-        this.chatService.joinChat(data.chatId);
+        hubReady
+          .then(() => this.chatService.joinChat(data.chatId))
+          .catch(err => console.error('Failed to join chat', err));
       });
   }
 
@@ -98,6 +103,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   private leaveCurrentChat(): void {
     const chatId = this.chatId();
+
     if (chatId) {
       this.chatService.leaveChat(chatId);
     }

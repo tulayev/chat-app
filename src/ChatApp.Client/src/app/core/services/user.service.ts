@@ -14,4 +14,8 @@ export class UserService {
   getUsers(): Observable<ApiResponse<User[]>> {
     return this.http.get<ApiResponse<User[]>>(this.apiUrl);
   }
+
+  searchUser(searchTerm: string): Observable<ApiResponse<User[]>> {
+    return this.http.get<ApiResponse<User[]>>(`${this.apiUrl}?search=${searchTerm}`);
+  }
 }

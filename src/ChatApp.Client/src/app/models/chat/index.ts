@@ -8,7 +8,7 @@ export interface UserChat {
   lastMessageTime: Date | null;
 }
 
-export interface ChatMessages {
+export interface ChatMessage {
   chatId: number;
   contact: User;
   messages: Message[];

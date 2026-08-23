@@ -26,6 +26,9 @@ namespace ChatApp.Application.CQRS.Users.Handlers
         {
             var users = await _userManager.Users
                 .Where(x => x.Id != query.CurrentUserId)
+                .Where(x => string.IsNullOrWhiteSpace(query.SearchTerm) ||
+                    x.UserName!.ToLower().Contains(query.SearchTerm) ||
+                    x.Email!.ToLower().Contains(query.SearchTerm))
                 .ProjectToType<UserDto>(_mapper.Config)
                 .ToListAsync(cancellationToken);
 

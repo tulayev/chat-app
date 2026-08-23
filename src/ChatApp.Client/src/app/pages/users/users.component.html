@@ -1,5 +1,72 @@
-@if (users$ | async; as users) {
-    @for (user of users; track user.id) {
-        <a [routerLink]="['/chat', user.id]">{{ user.username }}</a>
-    }
-}
+<section class="min-h-screen bg-gray-100">
+    <!-- Header -->
+    <header class="bg-primary-600 text-white">
+        <div class="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+            <span class="flex items-center gap-2 text-lg font-semibold">
+                <svg lucideMessageCircle class="w-5 h-5"></svg>
+                Chat App
+            </span>
+            <div class="flex items-center gap-3">
+                <app-avatar [src]="currentUser?.avatarUrl" [name]="currentUser?.username || 'You'" size="sm" />
+                <button
+                    type="button"
+                    (click)="onLogout()"
+                    class="btn-icon w-8 h-8 p-0 text-white/90 hover:bg-white/10 focus-visible:ring-primary-200"
+                    aria-label="Log out"
+                >
+                    <svg lucideLogOut class="w-4 h-4"></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="max-w-2xl mx-auto px-4 py-8">
+        <div class="mb-6">
+            <h1 class="text-xl font-bold text-gray-900">People</h1>
+            <p class="text-sm text-gray-500 mt-1">Pick someone to start a conversation</p>
+        </div>
+
+        <div class="card overflow-hidden">
+            <!-- Search -->
+            <div class="p-4 border-b border-gray-100">
+                <div class="relative">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                        <svg lucideSearch class="w-4 h-4"></svg>
+                    </span>
+                    <input
+                        [formControl]="searchBox"
+                        type="text"
+                        placeholder="Search people..."
+                        class="input-field input-field--icon"
+                    />
+                </div>
+            </div>
+
+            <!-- User List -->
+            <div class="divide-y divide-gray-100">
+                @if (users$ | async; as users) {
+                    @if (users.length) {
+                        @for (user of users; track user.id) {
+                            <a
+                                [routerLink]="['/chat', user.id]"
+                                class="contact-item rounded-none px-4 py-3"
+                            >
+                                <app-avatar [src]="user.avatarUrl" [name]="user.username" size="md" />
+                                <div class="flex-1 min-w-0">
+                                    <h2 class="text-sm font-semibold text-gray-900 truncate">{{ user.username }}</h2>
+                                    <p class="text-sm text-gray-500 truncate">{{ user.email }}</p>
+                                </div>
+                            </a>
+                        }
+                    } @else {
+                        <div class="flex flex-col items-center justify-center text-gray-400 gap-2 py-12">
+                            <svg lucideMessageCircle class="w-8 h-8"></svg>
+                            <p class="text-sm">No users found</p>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
