@@ -1,4 +1,4 @@
-﻿using ChatApp.API.Extensions;
+﻿using ChatApp.Application.Common.Extensions;
 using ChatApp.Application.CQRS.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

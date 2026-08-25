@@ -1,4 +1,4 @@
-﻿using ChatApp.API.Extensions;
+﻿using ChatApp.Application.Common.Extensions;
 using ChatApp.Application.CQRS.Messages.Commands;
 using ChatApp.Application.CQRS.Messages.Queries;
 using MediatR;

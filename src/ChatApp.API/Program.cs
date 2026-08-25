@@ -25,7 +25,7 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
-    app.MapHub<ChatHub>("hubs/chat");
+    app.MapHub<ChatHub>("hubs/chat").RequireAuthorization();
 
     app.Run();
 }
