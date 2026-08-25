@@ -10,7 +10,5 @@ namespace ChatApp.Domain.Models
         public AppUser User1 { get; set; } = null!;
         public AppUser User2 { get; set; } = null!;
         public ICollection<Message> Messages { get; set; } = [];
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 }

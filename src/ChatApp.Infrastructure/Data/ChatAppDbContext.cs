@@ -35,16 +35,23 @@ namespace ChatApp.Infrastructure.Data
         {
             var entries = ChangeTracker
                 .Entries<IAuditableEntity>()
-                .Where(e => e is IAuditableEntity && (e.State == EntityState.Added || e.State == EntityState.Modified));
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
             foreach (var entry in entries)
             {
                 if (entry.State == EntityState.Added)
                 {
-                    entry.Entity.CreatedAt = DateTime.UtcNow;
+                    entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
+                }
+                else
+                {
+                    // Attach()+Modified marks every shadow property dirty, including
+                    // CreatedAt, even though its value was never loaded onto the CLR
+                    // entity. Don't let that write DateTime.MinValue back to the row.
+                    entry.Property("CreatedAt").IsModified = false;
                 }
 
-                entry.Entity.UpdatedAt = DateTime.UtcNow;
+                entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
             }
         }
     }

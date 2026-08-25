@@ -1,4 +1,5 @@
 ﻿using ChatApp.Domain.Models;
+using ChatApp.Infrastructure.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,6 +10,7 @@ namespace ChatApp.Infrastructure.Data.Configurations
         public void Configure(EntityTypeBuilder<Chat> builder)
         {
             builder.HasKey(x => x.Id);
+            builder.ConfigureAuditableEntity();
 
             builder.HasOne(x => x.User1)
                 .WithMany()
