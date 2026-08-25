@@ -14,6 +14,10 @@ namespace ChatApp.Infrastructure.Data.Configurations
             builder.HasIndex(x => x.SentAt)
                 .IsDescending()
                 .HasDatabaseName("IX_Messages_SentAt_DESC");
+
+            builder.Property(x => x.Content)
+                .IsRequired()
+                .HasMaxLength(1000);
         }
     }
 }

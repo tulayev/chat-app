@@ -31,7 +31,8 @@ namespace ChatApp.Application.CQRS.Login.Handlers
             var request = query.LoginRequestDto;
 
             var user = await _unitOfWork.GetQueryable<AppUser>()
-                .FirstOrDefaultAsync(x => x.Email == request.UsernameOrEmail || x.UserName == request.UsernameOrEmail);
+                .FirstOrDefaultAsync(x => x.Email == request.UsernameOrEmail || x.UserName == request.UsernameOrEmail, 
+                    cancellationToken: cancellationToken);
 
             if (user == null)
             {

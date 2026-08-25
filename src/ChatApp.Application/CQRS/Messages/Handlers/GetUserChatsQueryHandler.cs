@@ -26,7 +26,6 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
             var currentUserId = request.CurrentUserId;
 
             var chats = await _unitOfWork.GetQueryable<Chat>()
-                .AsNoTracking()
                 .Where(c => c.User1Id == currentUserId || c.User2Id == currentUserId)
                 .OrderByDescending(c => c.Messages.OrderByDescending(x => x.SentAt).Select(x => x.SentAt).FirstOrDefault())
                 .Select(x => new ChatDto

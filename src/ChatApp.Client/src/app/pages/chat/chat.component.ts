@@ -93,9 +93,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.mobileView.set('list');
   }
 
-  async onLogout(): Promise<void> {
-    this.leaveCurrentChat();
-    await this.chatService.stop();
+  onLogout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
   }

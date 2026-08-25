@@ -12,8 +12,7 @@ namespace ChatApp.Application.Mappings
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Content, src => src.Content)
                 .Map(dest => dest.SentAt, src => src.SentAt)
-                .Map(dest => dest.Sender, src => src.Sender)
-                .Map(dest => dest.Receiver, src => src.SenderId == src.Chat.User1Id ? src.Chat.User2 : src.Chat.User1);
+                .Map(dest => dest.Sender, src => src.Sender);
         }
     }
 }

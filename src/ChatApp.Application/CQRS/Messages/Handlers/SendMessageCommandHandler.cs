@@ -5,6 +5,7 @@ using ChatApp.Application.DTOs.User;
 using ChatApp.Application.Helpers;
 using ChatApp.Application.Hubs;
 using ChatApp.Domain.Models;
+using Mapster;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
@@ -38,21 +39,21 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
             await _unitOfWork.AddAsync(message);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var participants = await _unitOfWork.GetQueryable<Chat>()
+            var sender = await _unitOfWork.GetQueryable<Chat>()
                 .Where(x => x.Id == command.ChatId)
-                .Select(x => new
-                {
-                    Sender = x.User1Id == command.SenderId ? x.User1 : x.User2,
-                    Receiver = x.User1Id == command.SenderId ? x.User2 : x.User1
-                })
+                .Select(x => x.User1Id == command.SenderId ? x.User1 : x.User2)
+                .ProjectToType<UserDto>(_mapper.Config)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            var senderDto = _mapper.Map<UserDto>(participants!.Sender);
-            var receiverDto = _mapper.Map<UserDto>(participants.Receiver);
-            var result = new MessageDto(message.Id, message.Content!, message.SentAt, senderDto, receiverDto);
+            if (sender is null)
+            {
+                return ApiResponse<Unit>.Fail("User does not exist or not authenticated!");
+            }
+
+            var result = new MessageDto(message.Id, message.Content!, message.SentAt, sender);
 
             // Notify all in this chat
-            await _hub.Clients.Group($"chat-{command.ChatId}").SendAsync("ReceiveMessage", result);
+            await _hub.Clients.Group($"chat-{command.ChatId}").SendAsync("ReceiveMessage", result, cancellationToken: cancellationToken);
 
             return ApiResponse<Unit>.Ok(Unit.Value);
         }

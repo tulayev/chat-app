@@ -10,6 +10,26 @@ namespace ChatApp.Infrastructure.Data.Configurations
         public void Configure(EntityTypeBuilder<AppUser> builder)
         {
             builder.ConfigureAuditableEntity();
+
+            builder.Property(x => x.UserName)
+                .HasMaxLength(50)
+                .IsRequired();
+            
+            builder.Property(x => x.NormalizedUserName)
+                .HasMaxLength(50)
+                .IsRequired();
+            
+            builder.Property(x => x.Email)
+                .HasMaxLength(50)
+                .IsRequired();
+            
+            builder.Property(x => x.NormalizedEmail)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            builder.Property(x => x.EmailConfirmed)
+                .IsRequired()
+                .HasDefaultValue(false);
         }
     }
 }

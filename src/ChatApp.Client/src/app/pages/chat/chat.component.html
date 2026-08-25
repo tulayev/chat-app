@@ -120,6 +120,7 @@
                     />
                     <button
                         (click)="onSendClick()"
+                        [disabled]="!newMessage"
                         class="btn-primary"
                         aria-label="Send message"
                     >

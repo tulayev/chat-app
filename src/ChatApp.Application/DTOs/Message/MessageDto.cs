@@ -3,8 +3,7 @@
 namespace ChatApp.Application.DTOs.Message
 {
     public record MessageDto(int Id,
-        string Content, 
+        string Content,
         DateTime SentAt,
-        UserDto Sender,
-        UserDto Receiver);
+        UserDto Sender);
 }

@@ -5,5 +5,4 @@ export interface Message {
   content: string;
   sentAt: Date;
   sender: User;
-  receiver: User;
 }

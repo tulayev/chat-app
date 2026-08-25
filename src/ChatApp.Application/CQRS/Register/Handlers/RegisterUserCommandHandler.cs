@@ -34,14 +34,10 @@ namespace ChatApp.Application.CQRS.Register.Handlers
         {
             var request = command.RegisterRequestDto;
 
-            if (await _userManager.Users.AnyAsync(x => x.UserName == request.Username, cancellationToken))
+            if (await _userManager.Users.AnyAsync(x => x.UserName == request.Username || x.Email == request.Email, 
+                cancellationToken))
             {
-                return ApiResponse<AuthUserDto>.Fail("UserName is already taken.");
-            }
-
-            if (await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken))
-            {
-                return ApiResponse<AuthUserDto>.Fail("Email is already in use.");
+                return ApiResponse<AuthUserDto>.Fail("Username or Email is already taken.");
             }
 
             var user = new AppUser

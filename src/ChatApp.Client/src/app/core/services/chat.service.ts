@@ -68,12 +68,18 @@ export class ChatService {
 
   joinChat(chatId: number): void {
     this.rejoinChatId = chatId;
+    if (this.hubConnection.state !== signalR.HubConnectionState.Connected) {
+      return;
+    }
     this.hubConnection.invoke('JoinChat', chatId).catch(err => console.error('JoinChat failed', err));
   }
 
   leaveChat(chatId: number): void {
     if (this.rejoinChatId === chatId) {
       this.rejoinChatId = null;
+    }
+    if (this.hubConnection.state !== signalR.HubConnectionState.Connected) {
+      return;
     }
     this.hubConnection.invoke('LeaveChat', chatId).catch(err => console.error('LeaveChat failed', err));
   }

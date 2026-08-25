@@ -33,9 +33,11 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
                 return ApiResponse<ChatMessagesDto>.Fail("You cannot chat with yourself!");
             }
 
-            var chat = await _unitOfWork.GetQueryable<Chat>().FirstOrDefaultAsync(x =>
-                (x.User1Id == currentUserId && x.User2Id == receiverUserId)
-                || (x.User1Id == receiverUserId && x.User2Id == currentUserId), cancellationToken);
+            var chat = await _unitOfWork.GetQueryable<Chat>()
+                .FirstOrDefaultAsync(x =>
+                    (x.User1Id == currentUserId && x.User2Id == receiverUserId)
+                        || (x.User1Id == receiverUserId && x.User2Id == currentUserId), 
+                    cancellationToken);
 
             if (chat is null)
             {
@@ -50,8 +52,14 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
             }
 
             var contact = await _unitOfWork.GetQueryable<AppUser>()
-                .FirstAsync(x => x.Id == receiverUserId, cancellationToken);
-            var contactDto = _mapper.Map<UserDto>(contact);
+                .Where(x => x.Id == receiverUserId)
+                .ProjectToType<UserDto>(_mapper.Config)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (contact is null)
+            {
+                return ApiResponse<ChatMessagesDto>.Fail("The contact user is not found!");
+            }
 
             var messages = await _unitOfWork.GetQueryable<Chat>()
                 .Where(x => x.Id == chat.Id)
@@ -59,7 +67,7 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
                 .ProjectToType<MessageDto>(_mapper.Config)
                 .ToListAsync(cancellationToken);
 
-            return ApiResponse<ChatMessagesDto>.Ok(new ChatMessagesDto(chat.Id, contactDto, messages));
+            return ApiResponse<ChatMessagesDto>.Ok(new ChatMessagesDto(chat.Id, contact, messages));
         }
     }
 }
