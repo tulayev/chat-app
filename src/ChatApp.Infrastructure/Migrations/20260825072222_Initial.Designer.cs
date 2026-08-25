@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ChatAppDbContext))]
-    [Migration("20260823095451_Initial")]
+    [Migration("20260825072222_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -179,6 +179,10 @@ namespace ChatApp.Infrastructure.Migrations
                     b.HasIndex("ChatId");
 
                     b.HasIndex("SenderId");
+
+                    b.HasIndex("SentAt")
+                        .IsDescending()
+                        .HasDatabaseName("IX_Messages_SentAt_DESC");
 
                     b.ToTable("Messages");
                 });

@@ -112,9 +112,9 @@ namespace ChatApp.Infrastructure.Migrations
                     User1Id = table.Column<int>(type: "integer", nullable: false),
                     User2Id = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     MaxUserId = table.Column<int>(type: "integer", nullable: false, computedColumnSql: "GREATEST(\"User1Id\", \"User2Id\")", stored: true),
-                    MinUserId = table.Column<int>(type: "integer", nullable: false, computedColumnSql: "LEAST(\"User1Id\", \"User2Id\")", stored: true)
+                    MinUserId = table.Column<int>(type: "integer", nullable: false, computedColumnSql: "LEAST(\"User1Id\", \"User2Id\")", stored: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -209,6 +209,12 @@ namespace ChatApp.Infrastructure.Migrations
                 name: "IX_Messages_SenderId",
                 table: "Messages",
                 column: "SenderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_SentAt_DESC",
+                table: "Messages",
+                column: "SentAt",
+                descending: new bool[0]);
         }
 
         /// <inheritdoc />

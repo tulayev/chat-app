@@ -177,6 +177,10 @@ namespace ChatApp.Infrastructure.Migrations
 
                     b.HasIndex("SenderId");
 
+                    b.HasIndex("SentAt")
+                        .IsDescending()
+                        .HasDatabaseName("IX_Messages_SentAt_DESC");
+
                     b.ToTable("Messages");
                 });
 

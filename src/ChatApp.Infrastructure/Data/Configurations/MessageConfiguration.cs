@@ -10,6 +10,10 @@ namespace ChatApp.Infrastructure.Data.Configurations
         public void Configure(EntityTypeBuilder<Message> builder)
         {
             builder.ConfigureAuditableEntity();
+
+            builder.HasIndex(x => x.SentAt)
+                .IsDescending()
+                .HasDatabaseName("IX_Messages_SentAt_DESC");
         }
     }
 }

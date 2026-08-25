@@ -9,7 +9,6 @@ namespace ChatApp.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Chat> builder)
         {
-            builder.HasKey(x => x.Id);
             builder.ConfigureAuditableEntity();
 
             builder.HasOne(x => x.User1)
