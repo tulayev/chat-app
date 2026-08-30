@@ -36,7 +36,8 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
                         currentUserId == x.User1Id ? x.User2Id : x.User1Id,
                         currentUserId == x.User1Id ? x.User2.UserName! : x.User1.UserName!,
                         currentUserId == x.User1Id ? x.User2.Email! : x.User1.Email!,
-                        currentUserId == x.User1Id ? x.User2.AvatarUrl! : x.User1.AvatarUrl!
+                        currentUserId == x.User1Id ? x.User2.AvatarUrl! : x.User1.AvatarUrl!,
+                        currentUserId == x.User1Id ? x.User2.EmailConfirmed : x.User1.EmailConfirmed
                     ),
                     x.Messages.OrderByDescending(x => x.SentAt).Select(x => x.Content).FirstOrDefault(),
                     x.Messages.OrderByDescending(x => x.SentAt).Select(x => x.SentAt).FirstOrDefault()

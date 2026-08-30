@@ -19,7 +19,7 @@ namespace ChatApp.API.Controllers
         [HttpGet("")]
         public async Task<IActionResult> GetUsers([FromQuery] string? search)
         {
-            var response = await _mediator.Send(new GetUsersQuery(User.GetUserId(), search?.ToLower()));
+            var response = await _mediator.Send(new GetUsersQuery(User.GetUserId(), search?.ToUpper()));
             return HandleResponse(response);
         }
     }

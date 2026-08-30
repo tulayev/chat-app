@@ -1,7 +1,6 @@
 ﻿using ChatApp.Application.Common.Interfaces.Images;
 using ChatApp.Application.Common.Interfaces.Security;
 using ChatApp.Application.CQRS.Register.Commands;
-using ChatApp.Application.DTOs.Auth;
 using ChatApp.Application.Helpers;
 using ChatApp.Domain.Models;
 using MediatR;
@@ -11,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ChatApp.Application.CQRS.Register.Handlers
 {
-    public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, ApiResponse<AuthUserDto>>
+    public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, ApiResponse<string>>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
@@ -30,14 +29,14 @@ namespace ChatApp.Application.CQRS.Register.Handlers
             _logger = logger;
         }
 
-        public async Task<ApiResponse<AuthUserDto>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
+        public async Task<ApiResponse<string>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var request = command.RegisterRequestDto;
 
             if (await _userManager.Users.AnyAsync(x => x.UserName == request.Username || x.Email == request.Email, 
                 cancellationToken))
             {
-                return ApiResponse<AuthUserDto>.Fail("Username or Email is already taken.");
+                return ApiResponse<string>.Fail("Username or Email is already taken.");
             }
 
             var user = new AppUser
@@ -59,16 +58,19 @@ namespace ChatApp.Application.CQRS.Register.Handlers
             if (!result.Succeeded)
             {
                 var error = string.Join("; ", result.Errors.Select(e => e.Description));
-                return ApiResponse<AuthUserDto>.Fail($"Registration failed: {error}");
+                return ApiResponse<string>.Fail($"Registration failed: {error}");
             }
 
             var token = _jwtTokenService.CreateToken(user);
 
-            var response = new AuthUserDto(user.Id, token, user.UserName!, user.Email!, user.AvatarUrl);
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return ApiResponse<string>.Fail("Something went wrong");
+            }
 
             _logger.LogInformation($"New user with username: {user.UserName} has registered!");
 
-            return ApiResponse<AuthUserDto>.Ok(response);
+            return ApiResponse<string>.Ok(token);
         }
     }
 }

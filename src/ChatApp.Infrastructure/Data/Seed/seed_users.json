@@ -2,16 +2,19 @@
   {
     "UserName": "Jon",
     "Email": "jon@chat.app",
-    "AvatarUrl": "https://res.cloudinary.com/dsiwchhma/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1661592812/samples/animals/cat.jpg"
+    "AvatarUrl": "https://res.cloudinary.com/dsiwchhma/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1661592812/samples/animals/cat.jpg",
+    "EmailConfirmed": true
   },
   {
     "UserName": "Lisa",
     "Email": "lisa@chat.app",
-    "AvatarUrl": "https://res.cloudinary.com/dsiwchhma/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1661592817/samples/animals/three-dogs.jpg"
+    "AvatarUrl": "https://res.cloudinary.com/dsiwchhma/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1661592817/samples/animals/three-dogs.jpg",
+    "EmailConfirmed": true
   },
   {
     "UserName": "Rob",
     "Email": "rob@chat.app",
-    "AvatarUrl": "https://res.cloudinary.com/dsiwchhma/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1661592813/samples/animals/reindeer.jpg"
+    "AvatarUrl": "https://res.cloudinary.com/dsiwchhma/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1661592813/samples/animals/reindeer.jpg",
+    "EmailConfirmed": true
   }
 ]

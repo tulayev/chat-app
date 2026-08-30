@@ -6,7 +6,14 @@ export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (authService.user) {
+  const user = authService.user;
+
+  if (user) {
+    if (!user.emailConfirmed) {
+      router.navigate(['/verify-email']);
+      return false;
+    }
+
     return true;
   }
 

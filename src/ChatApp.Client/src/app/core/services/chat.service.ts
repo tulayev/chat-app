@@ -26,7 +26,7 @@ export class ChatService {
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(this.chatHubUrl, {
-        accessTokenFactory: () => this.authService.user?.token ?? ''
+        accessTokenFactory: () => this.authService.token ?? ''
       })
       .withAutomaticReconnect()
       .build();

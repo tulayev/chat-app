@@ -1,7 +1,6 @@
 ﻿using ChatApp.Application.Common.Interfaces.Repositories;
 using ChatApp.Application.Common.Interfaces.Security;
 using ChatApp.Application.CQRS.Login.Queries;
-using ChatApp.Application.DTOs.Auth;
 using ChatApp.Application.Helpers;
 using ChatApp.Domain.Models;
 using MediatR;
@@ -10,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Application.CQRS.Login.Handlers
 {
-    public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ApiResponse<AuthUserDto>>
+    public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ApiResponse<string>>
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IUnitOfWork _unitOfWork;
@@ -26,7 +25,7 @@ namespace ChatApp.Application.CQRS.Login.Handlers
             _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<ApiResponse<AuthUserDto>> Handle(LoginUserQuery query, CancellationToken cancellationToken)
+        public async Task<ApiResponse<string>> Handle(LoginUserQuery query, CancellationToken cancellationToken)
         {
             var request = query.LoginRequestDto;
 
@@ -36,21 +35,24 @@ namespace ChatApp.Application.CQRS.Login.Handlers
 
             if (user == null)
             {
-                return ApiResponse<AuthUserDto>.Fail("User is not found");
+                return ApiResponse<string>.Fail("User is not found");
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
 
             if (!result.Succeeded)
             {
-                return ApiResponse<AuthUserDto>.Fail("Login or password is incorrect.");
+                return ApiResponse<string>.Fail("Login or password is incorrect.");
             }
 
             var token = _jwtTokenService.CreateToken(user);
 
-            var response = new AuthUserDto(user.Id, token, user.UserName!, user.Email!, user.AvatarUrl);
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return ApiResponse<string>.Fail("Something went wrong");
+            }
 
-            return ApiResponse<AuthUserDto>.Ok(response);
+            return ApiResponse<string>.Ok(token);
         }
     }
 }

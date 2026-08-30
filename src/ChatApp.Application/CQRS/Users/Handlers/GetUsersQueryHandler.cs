@@ -1,4 +1,5 @@
-﻿using ChatApp.Application.CQRS.Users.Queries;
+﻿using ChatApp.Application.Common.Extensions;
+using ChatApp.Application.CQRS.Users.Queries;
 using ChatApp.Application.DTOs.User;
 using ChatApp.Application.Helpers;
 using ChatApp.Domain.Models;
@@ -26,9 +27,10 @@ namespace ChatApp.Application.CQRS.Users.Handlers
         {
             var users = await _userManager.Users
                 .Where(x => x.Id != query.CurrentUserId)
+                .WhereEmailConfirmed()
                 .Where(x => string.IsNullOrWhiteSpace(query.SearchTerm) ||
-                    x.UserName!.ToLower().Contains(query.SearchTerm) ||
-                    x.Email!.ToLower().Contains(query.SearchTerm))
+                    x.NormalizedUserName!.Contains(query.SearchTerm) ||
+                    x.NormalizedEmail!.Contains(query.SearchTerm))
                 .ProjectToType<UserDto>(_mapper.Config)
                 .ToListAsync(cancellationToken);
 

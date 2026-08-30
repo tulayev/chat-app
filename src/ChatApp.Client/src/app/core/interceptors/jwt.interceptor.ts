@@ -5,10 +5,10 @@ import { AuthService } from '@core/services';
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
-  if (authService.user) {
+  if (authService.token) {
     req = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${authService.user.token}`
+        Authorization: `Bearer ${authService.token}`
       }
     });
   }
