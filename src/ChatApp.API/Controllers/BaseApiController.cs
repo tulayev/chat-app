@@ -1,10 +1,12 @@
-﻿using ChatApp.Application.Helpers;
+﻿using Asp.Versioning;
+using ChatApp.Application.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public abstract class BaseApiController : ControllerBase
     {
         protected ActionResult HandleResponse<T>(ApiResponse<T> response)

@@ -1,3 +1,4 @@
+using Asp.Versioning.ApiExplorer;
 using ChatApp.API.Extensions;
 using ChatApp.API.Middlewares;
 using ChatApp.Application;
@@ -19,6 +20,19 @@ try
     builder.Services.AddAppServices();
 
     var app = await builder.Build().MigrateDatabaseAsync();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
+        {
+            foreach (var description in app.DescribeApiVersions())
+            {
+                options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
+                    description.GroupName.ToUpperInvariant());
+            }
+        });
+    }
 
     app.UseMiddleware<ExceptionMiddleware>();
     app.UseCors("Cors");
