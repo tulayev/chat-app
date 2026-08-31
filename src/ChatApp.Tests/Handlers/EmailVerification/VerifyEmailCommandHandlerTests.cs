@@ -1,3 +1,4 @@
+using ChatApp.Application.Common.Enums;
 using ChatApp.Application.Common.Interfaces.Security;
 using ChatApp.Application.CQRS.EmailVerification.Commands;
 using ChatApp.Application.CQRS.EmailVerification.Handlers;
@@ -22,7 +23,7 @@ namespace ChatApp.Tests.Handlers.EmailVerification
         public async Task Handle_NoStoredCode_ThrowsInvalidOperationException()
         {
             var handler = BuildHandler(out _);
-            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>())).ReturnsAsync((string?)null);
+            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>(), It.IsAny<VerificationPurpose>())).ReturnsAsync((string?)null);
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 handler.Handle(new VerifyEmailCommand("alice@example.com", "123456"), CancellationToken.None));
@@ -32,7 +33,7 @@ namespace ChatApp.Tests.Handlers.EmailVerification
         public async Task Handle_CodeMismatch_ThrowsException()
         {
             var handler = BuildHandler(out _);
-            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>())).ReturnsAsync("111111");
+            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>(), It.IsAny<VerificationPurpose>())).ReturnsAsync("111111");
 
             var ex = await Assert.ThrowsAsync<Exception>(() =>
                 handler.Handle(new VerifyEmailCommand("alice@example.com", "222222"), CancellationToken.None));
@@ -44,7 +45,7 @@ namespace ChatApp.Tests.Handlers.EmailVerification
         public async Task Handle_UserNotFoundAfterCodeMatches_ThrowsException()
         {
             var handler = BuildHandler(out var userManagerMock);
-            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>())).ReturnsAsync("111111");
+            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>(), It.IsAny<VerificationPurpose>())).ReturnsAsync("111111");
             userManagerMock.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync((AppUser?)null);
 
             var ex = await Assert.ThrowsAsync<Exception>(() =>
@@ -58,7 +59,7 @@ namespace ChatApp.Tests.Handlers.EmailVerification
         {
             var handler = BuildHandler(out var userManagerMock);
             var user = new AppUser { Id = 1, Email = "alice@example.com", EmailConfirmed = false };
-            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>())).ReturnsAsync("111111");
+            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>(), It.IsAny<VerificationPurpose>())).ReturnsAsync("111111");
             userManagerMock.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
             AppUser? updatedUser = null;
             userManagerMock.Setup(x => x.UpdateAsync(It.IsAny<AppUser>()))
@@ -76,13 +77,13 @@ namespace ChatApp.Tests.Handlers.EmailVerification
         {
             var handler = BuildHandler(out var userManagerMock);
             var user = new AppUser { Id = 1, Email = "alice@example.com" };
-            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>())).ReturnsAsync("111111");
+            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>(), It.IsAny<VerificationPurpose>())).ReturnsAsync("111111");
             userManagerMock.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
             userManagerMock.Setup(x => x.UpdateAsync(It.IsAny<AppUser>())).ReturnsAsync(IdentityResult.Success);
 
             await handler.Handle(new VerifyEmailCommand("alice@example.com", "111111"), CancellationToken.None);
 
-            _verificationCodeServiceMock.Verify(x => x.DeleteCodeAsync("alice@example.com"), Times.Once);
+            _verificationCodeServiceMock.Verify(x => x.DeleteCodeAsync("alice@example.com", VerificationPurpose.EmailVerification), Times.Once);
         }
 
         [Fact]
@@ -90,7 +91,7 @@ namespace ChatApp.Tests.Handlers.EmailVerification
         {
             var handler = BuildHandler(out var userManagerMock);
             var user = new AppUser { Id = 1, Email = "alice@example.com" };
-            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>())).ReturnsAsync("111111");
+            _verificationCodeServiceMock.Setup(x => x.GetCodeAsync(It.IsAny<string>(), It.IsAny<VerificationPurpose>())).ReturnsAsync("111111");
             userManagerMock.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
             userManagerMock.Setup(x => x.UpdateAsync(It.IsAny<AppUser>())).ReturnsAsync(IdentityResult.Success);
 

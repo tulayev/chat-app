@@ -4,10 +4,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { User, UserChat } from '@app/models';
 import { AuthService, ChatService } from '@core/services';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EMPTY, map, Observable, switchMap } from 'rxjs';
 import {
-  LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut
+  LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut,
+  LucideSettings
 } from '@lucide/angular';
 import { AvatarComponent } from '@shared/components';
 
@@ -15,8 +16,9 @@ import { AvatarComponent } from '@shared/components';
   selector: 'app-chat',
   standalone: true,
   imports: [
-    FormsModule, CommonModule, AvatarComponent,
-    LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut
+    FormsModule, CommonModule, RouterModule, AvatarComponent,
+    LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut,
+    LucideSettings
   ],
   templateUrl: './chat.component.html'
 })

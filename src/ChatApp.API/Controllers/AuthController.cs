@@ -1,5 +1,6 @@
 ﻿using ChatApp.Application.Common.Extensions;
 using ChatApp.Application.CQRS.Login.Queries;
+using ChatApp.Application.CQRS.PasswordReset.Commands;
 using ChatApp.Application.CQRS.Register.Commands;
 using ChatApp.Application.CQRS.Users.Queries;
 using ChatApp.Application.DTOs.Auth;
@@ -39,6 +40,16 @@ namespace ChatApp.API.Controllers
         {
             var userId = User.GetUserId();
             var response = await _mediator.Send(new GetAuthenticatedUserQuery(userId));
+
+            return HandleResponse(response);
+        }
+
+        [Authorize]
+        [HttpPut("password")]
+        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequestDto request)
+        {
+            var userId = User.GetUserId();
+            var response = await _mediator.Send(new ChangePasswordCommand(userId, request.CurrentPassword, request.NewPassword));
 
             return HandleResponse(response);
         }

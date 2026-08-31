@@ -50,6 +50,11 @@ export class AuthService {
       );
   }
 
+  refreshUser(): Observable<ApiResponse<User>> {
+    return this.http.get<ApiResponse<User>>(`${this.apiUrl}/me`)
+      .pipe(tap(({ data }) => this.setUser(data)));
+  }
+
   logout(): void {
     localStorage.removeItem('user');
     localStorage.removeItem('token');

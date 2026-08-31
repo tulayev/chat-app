@@ -1,4 +1,5 @@
-﻿using ChatApp.Application.Common.Interfaces.Security;
+using ChatApp.Application.Common.Enums;
+using ChatApp.Application.Common.Interfaces.Security;
 using StackExchange.Redis;
 
 namespace ChatApp.Infrastructure.Services.Security
@@ -12,25 +13,32 @@ namespace ChatApp.Infrastructure.Services.Security
             _db = redis.GetDatabase();
         }
 
-        public async Task StoreCodeAsync(string email, string code, TimeSpan lifetime)
+        public async Task StoreCodeAsync(string email, string code, TimeSpan lifetime, VerificationPurpose purpose = VerificationPurpose.EmailVerification)
         {
-            await _db.StringSetAsync(NormalizeKey(email), code, lifetime);
+            await _db.StringSetAsync(NormalizeKey(email, purpose), code, lifetime);
         }
 
-        public async Task<string?> GetCodeAsync(string email)
+        public async Task<string?> GetCodeAsync(string email, VerificationPurpose purpose = VerificationPurpose.EmailVerification)
         {
-            var value = await _db.StringGetAsync(NormalizeKey(email));
+            var value = await _db.StringGetAsync(NormalizeKey(email, purpose));
             return value.HasValue ? value.ToString() : null;
         }
 
-        public async Task DeleteCodeAsync(string email)
+        public async Task DeleteCodeAsync(string email, VerificationPurpose purpose = VerificationPurpose.EmailVerification)
         {
-            await _db.KeyDeleteAsync(NormalizeKey(email));
+            await _db.KeyDeleteAsync(NormalizeKey(email, purpose));
         }
 
-        private static string NormalizeKey(string email)
+        private static string NormalizeKey(string email, VerificationPurpose purpose)
         {
-            return $"verify:{email.Trim().ToLowerInvariant()}";
+            return $"{KeyPrefix(purpose)}:{email.Trim().ToLowerInvariant()}";
         }
+
+        private static string KeyPrefix(VerificationPurpose purpose) => purpose switch
+        {
+            VerificationPurpose.EmailVerification => "verify",
+            VerificationPurpose.PasswordReset => "reset",
+            _ => throw new ArgumentOutOfRangeException(nameof(purpose), purpose, null)
+        };
     }
 }

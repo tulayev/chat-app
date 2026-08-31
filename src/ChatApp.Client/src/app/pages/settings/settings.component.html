@@ -1,0 +1,121 @@
+<section class="min-h-screen bg-gray-50 px-4 py-10">
+    <div class="max-w-md mx-auto">
+        <button
+            type="button"
+            (click)="onBack()"
+            class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 mb-6 transition-colors duration-200"
+        >
+            <svg lucideArrowLeft class="w-4 h-4"></svg>
+            Back to chats
+        </button>
+
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-6">
+            Settings
+        </h1>
+
+        <!-- Profile section -->
+        <div class="auth-card mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Profile</h2>
+
+            <form class="space-y-5" [formGroup]="profileForm" (ngSubmit)="onSaveProfile()">
+                <div class="flex justify-center">
+                    <label for="avatar" class="relative cursor-pointer group">
+                        <div class="w-20 h-20 rounded-full overflow-hidden shadow-sm transition-shadow duration-200 group-hover:shadow-soft">
+                            @if (avatarPreviewUrl()) {
+                                <img [src]="avatarPreviewUrl()" alt="Avatar preview" class="w-full h-full object-cover" />
+                            } @else {
+                                <app-avatar [src]="currentUser?.avatarUrl" [name]="currentUser?.username || 'You'" size="lg" />
+                            }
+                        </div>
+                        <span class="absolute bottom-0 right-0 flex items-center justify-center w-7 h-7 rounded-full bg-primary-600 text-white shadow-soft ring-2 ring-white transition-colors duration-200 group-hover:bg-primary-700">
+                            <svg lucideCamera class="w-3.5 h-3.5"></svg>
+                        </span>
+                        <input
+                            type="file"
+                            id="avatar"
+                            (change)="onFileSelected($event)"
+                            accept="image/*"
+                            class="sr-only"
+                        />
+                    </label>
+                </div>
+
+                <div>
+                    <app-text-field
+                        label="Username"
+                        id="username"
+                        formControlName="username"
+                        autocomplete="username"
+                        placeholder="janedoe"
+                    >
+                        <svg lucideUser icon class="w-4 h-4"></svg>
+                    </app-text-field>
+                </div>
+
+                <button type="submit" class="btn-primary w-full">
+                    Save profile
+                </button>
+
+                @if (profileMessage) {
+                    <div [class]="profileMessageType() === 'error' ? 'alert-error' : 'alert-success'" class="text-left">
+                        <span>{{ profileMessage }}</span>
+                    </div>
+                }
+            </form>
+        </div>
+
+        <!-- Password section -->
+        <div class="auth-card">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Change password</h2>
+
+            <form class="space-y-5" [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+                <div>
+                    <app-text-field
+                        label="Current password"
+                        id="currentPassword"
+                        type="password"
+                        formControlName="currentPassword"
+                        autocomplete="current-password"
+                        placeholder="••••••••"
+                    >
+                        <svg lucideLock icon class="w-4 h-4"></svg>
+                    </app-text-field>
+                </div>
+                <div>
+                    <app-text-field
+                        label="New password"
+                        id="newPassword"
+                        type="password"
+                        formControlName="newPassword"
+                        autocomplete="new-password"
+                        placeholder="••••••••"
+                    >
+                        <svg lucideLock icon class="w-4 h-4"></svg>
+                    </app-text-field>
+                </div>
+                <div>
+                    <app-text-field
+                        label="Confirm new password"
+                        id="confirmPassword"
+                        type="password"
+                        formControlName="confirmPassword"
+                        autocomplete="new-password"
+                        placeholder="••••••••"
+                    >
+                        <svg lucideLock icon class="w-4 h-4"></svg>
+                    </app-text-field>
+                </div>
+
+                <button type="submit" class="btn-primary w-full">
+                    Change password
+                </button>
+
+                @if (passwordMessage) {
+                    <div [class]="passwordMessageType() === 'error' ? 'alert-error' : 'alert-success'" class="text-left">
+                        <span>{{ passwordMessage }}</span>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+</section>

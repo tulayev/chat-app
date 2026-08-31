@@ -1,3 +1,4 @@
+using ChatApp.Application.Common.Enums;
 using ChatApp.Application.Common.Interfaces.Email;
 using ChatApp.Application.Common.Interfaces.Security;
 using ChatApp.Application.CQRS.EmailVerification.Commands;
@@ -45,8 +46,8 @@ namespace ChatApp.Tests.Handlers.EmailVerification
             userManagerMock.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
 
             string? captured = null;
-            _verificationCodeServiceMock.Setup(x => x.StoreCodeAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TimeSpan>()))
-                .Callback<string, string, TimeSpan>((_, code, _) => captured = code)
+            _verificationCodeServiceMock.Setup(x => x.StoreCodeAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TimeSpan>(), It.IsAny<VerificationPurpose>()))
+                .Callback<string, string, TimeSpan, VerificationPurpose>((_, code, _, _) => captured = code)
                 .Returns(Task.CompletedTask);
 
             await handler.Handle(new SendVerificationCodeCommand("alice@example.com"), CancellationToken.None);
@@ -67,7 +68,7 @@ namespace ChatApp.Tests.Handlers.EmailVerification
             await handler.Handle(new SendVerificationCodeCommand("alice@example.com"), CancellationToken.None);
 
             _verificationCodeServiceMock.Verify(x => x.StoreCodeAsync(
-                "alice@example.com", It.IsAny<string>(), TimeSpan.FromMinutes(10)), Times.Once);
+                "alice@example.com", It.IsAny<string>(), TimeSpan.FromMinutes(10), VerificationPurpose.EmailVerification), Times.Once);
         }
 
         [Fact]
@@ -78,8 +79,8 @@ namespace ChatApp.Tests.Handlers.EmailVerification
             userManagerMock.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
 
             string? captured = null;
-            _verificationCodeServiceMock.Setup(x => x.StoreCodeAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TimeSpan>()))
-                .Callback<string, string, TimeSpan>((_, code, _) => captured = code)
+            _verificationCodeServiceMock.Setup(x => x.StoreCodeAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TimeSpan>(), It.IsAny<VerificationPurpose>()))
+                .Callback<string, string, TimeSpan, VerificationPurpose>((_, code, _, _) => captured = code)
                 .Returns(Task.CompletedTask);
 
             await handler.Handle(new SendVerificationCodeCommand("alice@example.com"), CancellationToken.None);

@@ -43,6 +43,13 @@
             <span class="flex-1 min-w-0 text-sm font-medium text-gray-700 truncate">
                 {{ currentUser?.username }}
             </span>
+            <a
+                routerLink="/settings"
+                class="btn-icon w-8 h-8 p-0 text-gray-500 hover:text-primary-600 hover:bg-primary-50"
+                aria-label="Settings"
+            >
+                <svg lucideSettings class="w-4 h-4"></svg>
+            </a>
             <button
                 type="button"
                 (click)="onLogout()"
