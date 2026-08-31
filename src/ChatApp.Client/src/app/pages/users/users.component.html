@@ -7,7 +7,7 @@
                 Chat App
             </span>
             <div class="flex items-center gap-3">
-                <app-avatar [src]="currentUser?.avatarUrl" [name]="currentUser?.username || 'You'" size="sm" />
+                <app-avatar [src]="currentUser()?.avatarUrl" [name]="currentUser()?.username || 'You'" size="sm" />
                 <button
                     type="button"
                     (click)="onLogout()"

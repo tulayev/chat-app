@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { ApiResponse, ChatMessage, Message, UserChat } from '@app/models';
-import { AuthService } from '@core/services/auth.service';
+import { Store } from '@ngrx/store';
+import { selectToken } from '@store/auth';
 import { environment } from 'environments/environment';
 import * as signalR from '@microsoft/signalr';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
@@ -14,7 +15,8 @@ export class ChatService {
   messages$ = this.messagesSource.asObservable();
   private readonly chatHubUrl = `${environment.baseUrl}/hubs/chat`;
   private readonly apiUrl = `${environment.apiUrl}`;
-  private readonly authService = inject(AuthService);
+  private readonly store = inject(Store);
+  private readonly token = this.store.selectSignal(selectToken);
   private readonly http = inject(HttpClient);
   private hubConnection!: signalR.HubConnection;
   private rejoinChatId: number | null = null;
@@ -26,7 +28,7 @@ export class ChatService {
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(this.chatHubUrl, {
-        accessTokenFactory: () => this.authService.token ?? ''
+        accessTokenFactory: () => this.token() ?? ''
       })
       .withAutomaticReconnect()
       .build();

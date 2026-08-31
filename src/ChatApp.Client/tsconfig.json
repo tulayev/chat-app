@@ -10,6 +10,7 @@
       "@models": ["./src/app/models/*"],
       "@pages/*": ["./src/app/pages/*"],
       "@shared/*": ["./src/app/shared/*"],
+      "@store/*": ["./src/app/store/*"],
     },
     "strict": true,
     "noImplicitOverride": true,

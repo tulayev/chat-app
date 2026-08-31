@@ -2,13 +2,14 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { AuthService } from '@core/services';
+import { Store } from '@ngrx/store';
+import { AuthActions } from '@store/auth';
 import { catchError, throwError } from 'rxjs';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const toastr = inject(ToastrService);
-  const authService = inject(AuthService);
+  const store = inject(Store);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -22,8 +23,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
           case 401:
             toastr.error('Unauthorized', error.status.toString());
-            authService.logout();
-            router.navigateByUrl('/login');
+            store.dispatch(AuthActions.logout());
             break;
 
           case 404:

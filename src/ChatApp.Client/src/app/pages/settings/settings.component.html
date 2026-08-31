@@ -24,7 +24,7 @@
                             @if (avatarPreviewUrl()) {
                                 <img [src]="avatarPreviewUrl()" alt="Avatar preview" class="w-full h-full object-cover" />
                             } @else {
-                                <app-avatar [src]="currentUser?.avatarUrl" [name]="currentUser?.username || 'You'" size="lg" />
+                                <app-avatar [src]="currentUser()?.avatarUrl" [name]="currentUser()?.username || 'You'" size="lg" />
                             }
                         </div>
                         <span class="absolute bottom-0 right-0 flex items-center justify-center w-7 h-7 rounded-full bg-primary-600 text-white shadow-soft ring-2 ring-white transition-colors duration-200 group-hover:bg-primary-700">

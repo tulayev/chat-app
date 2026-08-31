@@ -3,8 +3,10 @@ import { Component, DestroyRef, OnInit, OnDestroy, inject, signal } from '@angul
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { User, UserChat } from '@app/models';
-import { AuthService, ChatService } from '@core/services';
+import { ChatService } from '@core/services';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { AuthActions, selectUser } from '@store/auth';
 import { EMPTY, map, Observable, switchMap } from 'rxjs';
 import {
   LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut,
@@ -23,13 +25,13 @@ import { AvatarComponent } from '@shared/components';
   templateUrl: './chat.component.html'
 })
 export class ChatComponent implements OnInit, OnDestroy {
-  private readonly authService = inject(AuthService);
+  private readonly store = inject(Store);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly chatService = inject(ChatService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly currentUser = this.authService.user;
+  readonly currentUser = this.store.selectSignal(selectUser);
   readonly chatMessages$ = this.chatService.messages$;
 
   userChats$!: Observable<UserChat[]>;
@@ -96,8 +98,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   onLogout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    this.store.dispatch(AuthActions.logout());
   }
 
   private leaveCurrentChat(): void {

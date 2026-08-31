@@ -39,9 +39,9 @@
 
         <!-- Sidebar Footer -->
         <div class="mt-auto border-t border-gray-200 p-3 flex items-center gap-3 shrink-0">
-            <app-avatar [src]="currentUser?.avatarUrl" [name]="currentUser?.username || 'You'" size="sm" />
+            <app-avatar [src]="currentUser()?.avatarUrl" [name]="currentUser()?.username || 'You'" size="sm" />
             <span class="flex-1 min-w-0 text-sm font-medium text-gray-700 truncate">
-                {{ currentUser?.username }}
+                {{ currentUser()?.username }}
             </span>
             <a
                 routerLink="/settings"

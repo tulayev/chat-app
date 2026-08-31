@@ -6,6 +6,9 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { errorInterceptor, jwtInterceptor } from '@core/interceptors';
 import { ToastrModule } from 'ngx-toastr';
+import { provideStore, provideState } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { authEffects, authFeature } from '@store/auth';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([
         jwtInterceptor,
-        errorInterceptor 
+        errorInterceptor
       ])
     ),
     provideAnimationsAsync(),
@@ -28,6 +31,10 @@ export const appConfig: ApplicationConfig = {
         positionClass: 'toast-bottom-right',
         preventDuplicates: true
       })
-    )
+    ),
+    // NgRx store
+    provideStore(),
+    provideState(authFeature),
+    provideEffects(authEffects)
   ]
 };

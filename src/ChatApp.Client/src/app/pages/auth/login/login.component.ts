@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '@core/services';
+import { RouterModule } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { AuthActions } from '@store/auth';
 import { LoginForm } from '../auth.models';
 import { LucideUser, LucideLock, LucideMessageCircle } from '@lucide/angular';
 import { TextFieldComponent } from '@shared/components';
@@ -22,8 +23,7 @@ export class LoginComponent {
     password: new FormControl('', [Validators.required]),
   });
 
-  private readonly router = inject(Router);
-  private readonly authService = inject(AuthService);
+  private readonly store = inject(Store);
 
   onSubmit(): void {
     if (this.form.invalid) {
@@ -31,8 +31,6 @@ export class LoginComponent {
       return;
     }
 
-    this.authService.login(this.form.value as LoginForm).subscribe({
-      next: () => this.router.navigate(['/users'])
-    });
+    this.store.dispatch(AuthActions.login({ credentials: this.form.value as LoginForm }));
   }
 }

@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService, ProfileService } from '@core/services';
+import { ProfileService } from '@core/services';
+import { Store } from '@ngrx/store';
+import { AuthActions, selectUser } from '@store/auth';
 import { ChangePasswordForm, UpdateProfileForm } from './settings.models';
 import { LucideArrowLeft, LucideCamera, LucideLock, LucideUser } from '@lucide/angular';
 import { AvatarComponent, TextFieldComponent } from '@shared/components';
@@ -17,14 +19,14 @@ import { avatarFileValidator, passwordStrengthValidator } from '@shared/validato
   templateUrl: './settings.component.html'
 })
 export class SettingsComponent implements OnDestroy {
-  private readonly authService = inject(AuthService);
+  private readonly store = inject(Store);
   private readonly profileService = inject(ProfileService);
   private readonly router = inject(Router);
 
-  readonly currentUser = this.authService.user;
+  readonly currentUser = this.store.selectSignal(selectUser);
 
   profileForm = new FormGroup({
-    username: new FormControl(this.currentUser?.username ?? '', [Validators.required, Validators.minLength(3)]),
+    username: new FormControl(this.currentUser()?.username ?? '', [Validators.required, Validators.minLength(3)]),
     avatar: new FormControl<File | null>(null, [avatarFileValidator()])
   });
   passwordForm = new FormGroup({
@@ -63,7 +65,7 @@ export class SettingsComponent implements OnDestroy {
 
     this.profileService.updateProfile(this.profileForm.value as UpdateProfileForm).subscribe({
       next: () => {
-        this.authService.refreshUser().subscribe();
+        this.store.dispatch(AuthActions.refreshUser());
         this.profileMessageType.set('success');
         this.profileMessage = 'Profile updated successfully';
       },

@@ -1,22 +1,27 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '@core/services';
+import { Store } from '@ngrx/store';
+import { map, take } from 'rxjs';
+import { selectUser } from '@store/auth';
 
 export const authGuard: CanActivateFn = () => {
-  const authService = inject(AuthService);
+  const store = inject(Store);
   const router = inject(Router);
 
-  const user = authService.user;
+  return store.select(selectUser).pipe(
+    take(1),
+    map((user) => {
+      if (user) {
+        if (!user.emailConfirmed) {
+          router.navigate(['/verify-email']);
+          return false;
+        }
 
-  if (user) {
-    if (!user.emailConfirmed) {
-      router.navigate(['/verify-email']);
+        return true;
+      }
+
+      router.navigate(['/login']);
       return false;
-    }
-
-    return true;
-  }
-
-  router.navigate(['/login']);
-  return false;
+    }),
+  );
 };

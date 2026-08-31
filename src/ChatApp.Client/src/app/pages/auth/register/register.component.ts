@@ -2,8 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegisterForm } from '../auth.models';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '@core/services';
+import { RouterModule } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { AuthActions } from '@store/auth';
 import { LucideUser, LucideMail, LucideLock, LucideCamera, LucideMessageCircle } from '@lucide/angular';
 import { TextFieldComponent, FieldErrorComponent } from '@shared/components';
 import { avatarFileValidator, passwordStrengthValidator } from '@shared/validators';
@@ -26,8 +27,7 @@ export class RegisterComponent implements OnDestroy {
   });
   avatarPreviewUrl = signal<string | null>(null);
 
-  private readonly router = inject(Router);
-  private readonly authService = inject(AuthService);
+  private readonly store = inject(Store);
 
   ngOnDestroy(): void {
     this.revokeAvatarPreviewUrl();
@@ -50,9 +50,7 @@ export class RegisterComponent implements OnDestroy {
       return;
     }
 
-    this.authService.register(this.form.value as RegisterForm).subscribe({
-      next: () => this.router.navigate(['/verify-email'], { queryParams: { email: this.form.value.email } })
-    });
+    this.store.dispatch(AuthActions.register({ credentials: this.form.value as RegisterForm }));
   }
 
   private revokeAvatarPreviewUrl(): void {

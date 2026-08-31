@@ -1,8 +1,10 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { AuthService, UserService } from '@app/core/services';
+import { UserService } from '@app/core/services';
 import { User } from '@app/models';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { AuthActions, selectUser } from '@store/auth';
 import { catchError, debounceTime, distinctUntilChanged, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { LucideLogOut, LucideMessageCircle, LucideSearch } from '@lucide/angular';
 import { AvatarComponent } from '@shared/components';
@@ -18,18 +20,16 @@ export class UsersComponent implements OnInit {
   searchBox = new FormControl('');
 
   private readonly userService = inject(UserService);
-  private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly store = inject(Store);
 
-  readonly currentUser = this.authService.user;
+  readonly currentUser = this.store.selectSignal(selectUser);
 
   ngOnInit(): void {
     this.loadData();
   }
 
   onLogout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    this.store.dispatch(AuthActions.logout());
   }
 
   private loadData(): void {
