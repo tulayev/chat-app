@@ -22,7 +22,7 @@ namespace ChatApp.Tests.Handlers.Messages
         private GetUserChatsQueryHandler BuildHandler()
         {
             var uow = TestUnitOfWorkFactory.Create(_db);
-            return new GetUserChatsQueryHandler(uow.Object, _mapperMock.Object);
+            return new GetUserChatsQueryHandler(uow.Object);
         }
 
         private void SeedUser(int id) =>

@@ -10,17 +10,20 @@ import { AuthActions, selectUser } from '@store/auth';
 import { EMPTY, map, Observable, switchMap } from 'rxjs';
 import {
   LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut,
-  LucideSettings
+  LucideSettings,
+  LucideCheck,
+  LucideCheckCheck
 } from '@lucide/angular';
 import { AvatarComponent } from '@shared/components';
+import { ElementHighlightDirective } from '@app/core/directives';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
   imports: [
-    FormsModule, CommonModule, RouterModule, AvatarComponent,
+    FormsModule, CommonModule, RouterModule, AvatarComponent, ElementHighlightDirective,
     LucideMessageCircle, LucidePanelLeftClose, LucidePanelLeftOpen, LucideArrowLeft, LucideSend, LucideLogOut,
-    LucideSettings
+    LucideSettings, LucideCheck, LucideCheckCheck
   ],
   templateUrl: './chat.component.html'
 })

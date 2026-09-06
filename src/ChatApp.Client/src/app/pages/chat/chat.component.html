@@ -108,6 +108,13 @@
                         <div class="flex items-end justify-end gap-2">
                             <div class="chat-bubble-out">
                                 {{ message.content }}
+                                <span class="ml-1 align-middle inline-flex" [attr.aria-label]="message.readAt ? 'Read' : 'Sent'">
+                                    @if (message.readAt) {
+                                        <svg lucideCheckCheck class="w-3.5 h-3.5 inline-block text-blue-300"></svg>
+                                    } @else {
+                                        <svg lucideCheck class="w-3.5 h-3.5 inline-block"></svg>
+                                    }
+                                </span>
                             </div>
                             <app-avatar [src]="message.sender.avatarUrl" [name]="message.sender.username" size="sm" />
                         </div>
@@ -129,6 +136,7 @@
                         (click)="onSendClick()"
                         [disabled]="!newMessage"
                         class="btn-primary"
+                        elementHighlight
                         aria-label="Send message"
                     >
                         <svg lucideSend class="w-4 h-4"></svg>

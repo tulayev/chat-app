@@ -9,6 +9,7 @@ namespace ChatApp.Domain.Models
         public int SenderId { get; set; }
         public string Content { get; set; } = null!;
         public DateTime SentAt { get; set; }
+        public DateTime? ReadAt { get; set; }
         public Chat Chat { get; set; } = null!;
         public AppUser Sender { get; set; } = null!;
     }

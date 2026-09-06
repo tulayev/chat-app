@@ -1,6 +1,8 @@
 ﻿using ChatApp.Application.Common.Extensions;
 using ChatApp.Application.Common.Interfaces.Repositories;
+using ChatApp.Application.CQRS.Messages.Commands;
 using ChatApp.Domain.Models;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +13,13 @@ namespace ChatApp.Application.Hubs
     public class ChatHub : Hub
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMediator _mediator;
 
-        public ChatHub(IUnitOfWork unitOfWork)
+        public ChatHub(IUnitOfWork unitOfWork,
+            IMediator mediator)
         {
             _unitOfWork = unitOfWork;
+            _mediator = mediator;
         }
 
         // Client connected
@@ -26,8 +31,9 @@ namespace ChatApp.Application.Hubs
         // Client subscribed to a certain chat
         public async Task JoinChat(int chatId)
         {
-            await EnsureParticipantAsync(chatId);
+            var userId = await EnsureParticipantAsync(chatId);
             await Groups.AddToGroupAsync(Context.ConnectionId, $"chat-{chatId}");
+            await _mediator.Send(new MarkMessagesReadCommand(chatId, userId));
         }
 
         // Client leaves a chat
@@ -37,7 +43,7 @@ namespace ChatApp.Application.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"chat-{chatId}");
         }
 
-        private async Task EnsureParticipantAsync(int chatId)
+        private async Task<int> EnsureParticipantAsync(int chatId)
         {
             var userId = Context.User!.GetUserId();
             var isParticipant = await _unitOfWork.GetQueryable<Chat>()
@@ -47,6 +53,8 @@ namespace ChatApp.Application.Hubs
             {
                 throw new HubException("You are not a participant of this chat.");
             }
+
+            return userId;
         }
     }
 }

@@ -38,6 +38,14 @@ export class ChatService {
       this.messagesSource.next([...current, message]);
     });
 
+    this.hubConnection.on('MessagesRead', (payload: { chatId: number; readAt: string; messageIds: number[] }) => {
+      const messageIdSet = new Set(payload.messageIds);
+      const current = this.messagesSource.value;
+      this.messagesSource.next(
+        current.map(x => messageIdSet.has(x.id) ? { ...x, readAt: new Date(payload.readAt) } : x)
+      );
+    });
+
     this.hubConnection.onreconnected(() => {
       const chatId = this.rejoinChatId;
       if (chatId != null) {

@@ -5,5 +5,6 @@ namespace ChatApp.Application.DTOs.Message
     public record MessageDto(int Id,
         string Content,
         DateTime SentAt,
+        DateTime? ReadAt,
         UserDto Sender);
 }

@@ -12,6 +12,7 @@ namespace ChatApp.Application.Mappings
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Content, src => src.Content)
                 .Map(dest => dest.SentAt, src => src.SentAt)
+                .Map(dest => dest.ReadAt, src => src.ReadAt)
                 .Map(dest => dest.Sender, src => src.Sender);
         }
     }

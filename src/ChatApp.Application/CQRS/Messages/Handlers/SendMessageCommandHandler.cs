@@ -50,10 +50,11 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
                 return ApiResponse<Unit>.Fail("User does not exist or not authenticated!");
             }
 
-            var result = new MessageDto(message.Id, message.Content!, message.SentAt, sender);
+            var result = _mapper.Map<MessageDto>(message);
 
             // Notify all in this chat
-            await _hub.Clients.Group($"chat-{command.ChatId}").SendAsync("ReceiveMessage", result, cancellationToken: cancellationToken);
+            await _hub.Clients.Group($"chat-{command.ChatId}")
+                .SendAsync("ReceiveMessage", result, cancellationToken: cancellationToken);
 
             return ApiResponse<Unit>.Ok(Unit.Value);
         }

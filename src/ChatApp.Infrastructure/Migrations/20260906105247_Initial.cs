@@ -143,6 +143,7 @@ namespace ChatApp.Infrastructure.Migrations
                     SenderId = table.Column<int>(type: "integer", nullable: false),
                     Content = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ReadAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChatApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ChatAppDbContext))]
-    [Migration("20260830185333_Initial")]
+    [Migration("20260906105247_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -170,6 +170,9 @@ namespace ChatApp.Infrastructure.Migrations
                         .HasColumnType("character varying(1000)");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ReadAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("SenderId")
