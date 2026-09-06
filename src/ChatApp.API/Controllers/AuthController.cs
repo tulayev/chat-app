@@ -1,4 +1,5 @@
 ﻿using ChatApp.Application.Common.Extensions;
+using ChatApp.Application.CQRS.Login.Commands;
 using ChatApp.Application.CQRS.Login.Queries;
 using ChatApp.Application.CQRS.PasswordReset.Commands;
 using ChatApp.Application.CQRS.Register.Commands;
@@ -31,6 +32,13 @@ namespace ChatApp.API.Controllers
         public async Task<ActionResult<string>> Login([FromBody] LoginRequestDto request)
         {
             var response = await _mediator.Send(new LoginUserQuery(request));
+            return HandleResponse(response);
+        }
+        
+        [HttpPost("google")]
+        public async Task<ActionResult<string>> Google([FromBody] GoogleLoginRequestDto request)
+        {
+            var response = await _mediator.Send(new GoogleLoginCommand(request));
             return HandleResponse(response);
         }
 

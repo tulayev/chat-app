@@ -19,6 +19,19 @@ const login$ = createEffect(
   { functional: true },
 );
 
+const googleLogin$ = createEffect(
+  (actions$ = inject(Actions), authService = inject(AuthService)) => actions$.pipe(
+    ofType(AuthActions.googleLogin),
+    exhaustMap(({ idToken }) => authService.googleLogin(idToken).pipe(
+      map(({ user, token }) => AuthActions.googleLoginSuccess({ user, token })),
+      catchError((err: HttpErrorResponse) => of(AuthActions.googleLoginFailure({
+        error: err.error?.errorMessage ?? 'Login failed',
+      }))),
+    )),
+  ),
+  { functional: true },
+);
+
 const register$ = createEffect(
   (actions$ = inject(Actions), authService = inject(AuthService)) => actions$.pipe(
     ofType(AuthActions.register),
@@ -47,7 +60,7 @@ const refreshUser$ = createEffect(
 
 const persistOnAuthSuccess$ = createEffect(
   (actions$ = inject(Actions)) => actions$.pipe(
-    ofType(AuthActions.loginSuccess, AuthActions.registerSuccess),
+    ofType(AuthActions.loginSuccess, AuthActions.googleLoginSuccess, AuthActions.registerSuccess),
     tap(({ user, token }) => {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
@@ -77,7 +90,7 @@ const clearPersistedAuthOnLogout$ = createEffect(
 
 const navigateAfterLogin$ = createEffect(
   (actions$ = inject(Actions), router = inject(Router)) => actions$.pipe(
-    ofType(AuthActions.loginSuccess),
+    ofType(AuthActions.loginSuccess, AuthActions.googleLoginSuccess),
     tap(() => router.navigateByUrl('/users')),
   ),
   { functional: true, dispatch: false },
@@ -101,6 +114,7 @@ const navigateAfterLogout$ = createEffect(
 
 export const authEffects = {
   login$,
+  googleLogin$,
   register$,
   refreshUser$,
   persistOnAuthSuccess$,

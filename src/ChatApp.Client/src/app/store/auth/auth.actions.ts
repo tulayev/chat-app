@@ -8,6 +8,10 @@ export const AuthActions = createActionGroup({
     'Login': props<{ credentials: LoginForm }>(),
     'Login Success': props<{ user: User; token: string }>(),
     'Login Failure': props<{ error: string }>(),
+    
+    'GoogleLogin': props<{ idToken: string }>(),
+    'GoogleLogin Success': props<{ user: User; token: string }>(),
+    'GoogleLogin Failure': props<{ error: string }>(),
 
     'Register': props<{ credentials: RegisterForm }>(),
     'Register Success': props<{ user: User; token: string }>(),

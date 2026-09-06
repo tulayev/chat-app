@@ -4,7 +4,6 @@ using ChatApp.Application.DTOs.Chat;
 using ChatApp.Application.DTOs.User;
 using ChatApp.Application.Helpers;
 using ChatApp.Domain.Models;
-using MapsterMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,12 +12,10 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
     public class GetUserChatsQueryHandler : IRequestHandler<GetUserChatsQuery, ApiResponse<IEnumerable<ChatDto>>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public GetUserChatsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public GetUserChatsQueryHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<ApiResponse<IEnumerable<ChatDto>>> Handle(GetUserChatsQuery request, CancellationToken cancellationToken)
@@ -37,7 +34,8 @@ namespace ChatApp.Application.CQRS.Messages.Handlers
                         currentUserId == x.User1Id ? x.User2.UserName! : x.User1.UserName!,
                         currentUserId == x.User1Id ? x.User2.Email! : x.User1.Email!,
                         currentUserId == x.User1Id ? x.User2.AvatarUrl! : x.User1.AvatarUrl!,
-                        currentUserId == x.User1Id ? x.User2.EmailConfirmed : x.User1.EmailConfirmed
+                        currentUserId == x.User1Id ? x.User2.EmailConfirmed : x.User1.EmailConfirmed,
+                        currentUserId == x.User1Id ? x.User2.PasswordHash != null : x.User1.PasswordHash != null
                     ),
                     x.Messages.OrderByDescending(x => x.SentAt).Select(x => x.Content).FirstOrDefault(),
                     x.Messages.OrderByDescending(x => x.SentAt).Select(x => x.SentAt).FirstOrDefault()

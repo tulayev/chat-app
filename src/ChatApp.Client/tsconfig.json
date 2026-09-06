@@ -7,7 +7,7 @@
       "environments/*": ["./src/environments/*"],
       "@app/*": ["./src/app/*"],
       "@core/*": ["./src/app/core/*"],
-      "@models": ["./src/app/models/*"],
+      "@models/*": ["./src/app/models/*"],
       "@pages/*": ["./src/app/pages/*"],
       "@shared/*": ["./src/app/shared/*"],
       "@store/*": ["./src/app/store/*"],

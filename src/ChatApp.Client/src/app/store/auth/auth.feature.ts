@@ -6,12 +6,12 @@ export const authFeature = createFeature({
   name: 'auth',
   reducer: createReducer(
     initialAuthState,
-    on(AuthActions.login, AuthActions.register, AuthActions.refreshUser, (state) => ({
+    on(AuthActions.login, AuthActions.googleLogin, AuthActions.register, AuthActions.refreshUser, (state) => ({
       ...state,
       loading: true,
       error: null,
     })),
-    on(AuthActions.loginSuccess, AuthActions.registerSuccess, (state, { user, token }) => ({
+    on(AuthActions.loginSuccess, AuthActions.googleLoginSuccess, AuthActions.registerSuccess, (state, { user, token }) => ({
       ...state,
       user,
       token,
@@ -24,7 +24,7 @@ export const authFeature = createFeature({
       loading: false,
       error: null,
     })),
-    on(AuthActions.loginFailure, AuthActions.registerFailure, AuthActions.refreshUserFailure, (state, { error }) => ({
+    on(AuthActions.loginFailure, AuthActions.googleLoginFailure, AuthActions.registerFailure, AuthActions.refreshUserFailure, (state, { error }) => ({
       ...state,
       loading: false,
       error,

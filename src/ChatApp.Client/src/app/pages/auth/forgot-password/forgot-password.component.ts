@@ -30,6 +30,7 @@ export class ForgotPasswordComponent {
       this.form.markAllAsTouched();
       return;
     }
+    
     this.message = '';
 
     this.passwordResetService.forgotPassword(this.form.value as ForgotPasswordForm).subscribe({

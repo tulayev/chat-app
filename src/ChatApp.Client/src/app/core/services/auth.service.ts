@@ -44,6 +44,17 @@ export class AuthService {
       );
   }
 
+  googleLogin(idToken: string): Observable<{ user: User, token: string }> {
+    return this.http.post<ApiResponse<string>>(`${this.apiUrl}/google`, { idToken })
+      .pipe(
+        switchMap(({ data: token }) => this.http.get<ApiResponse<User>>(`${this.apiUrl}/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).pipe(
+          map(({ data: user }) => ({ user, token }))
+        ))
+      );
+  }
+
   refreshUser(): Observable<User> {
     return this.http.get<ApiResponse<User>>(`${this.apiUrl}/me`)
       .pipe(map(({ data }) => data));

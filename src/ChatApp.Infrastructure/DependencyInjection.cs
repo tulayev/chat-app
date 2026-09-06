@@ -1,4 +1,5 @@
 ﻿using ChatApp.Application.Common.Interfaces.Email;
+using ChatApp.Application.Common.Interfaces.GoogleAuth;
 using ChatApp.Application.Common.Interfaces.Images;
 using ChatApp.Application.Common.Interfaces.Repositories;
 using ChatApp.Application.Common.Interfaces.Security;
@@ -6,6 +7,7 @@ using ChatApp.Domain.Models;
 using ChatApp.Infrastructure.Data;
 using ChatApp.Infrastructure.Repositories;
 using ChatApp.Infrastructure.Services.Email;
+using ChatApp.Infrastructure.Services.GoogleAuth;
 using ChatApp.Infrastructure.Services.Images;
 using ChatApp.Infrastructure.Services.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -81,6 +83,7 @@ namespace ChatApp.Infrastructure
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IVerificationCodeService, VerificationCodeService>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
+            services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
             return services;
         }

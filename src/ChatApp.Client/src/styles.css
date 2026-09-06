@@ -31,6 +31,43 @@
     @apply btn p-2.5 rounded-full;
   }
 
+  /* Google Identity Services button — restyled to match .btn-secondary.
+     GSI injects its own stylesheet at runtime, so these selectors are kept
+     more specific than Google's in order to win without !important. */
+  .google-btn {
+    @apply w-full;
+    color-scheme: light;
+  }
+  .google-btn > div,
+  .google-btn iframe {
+    @apply w-full;
+  }
+  .google-btn [role='button'] {
+    @apply w-full rounded-lg border border-gray-300 bg-white shadow-sm
+           transition duration-150 ease-out
+           hover:bg-gray-50 active:scale-[0.98];
+    height: 42px;
+    max-width: none;
+  }
+  .google-btn [role='button']:focus-visible {
+    @apply outline-none ring-4 ring-gray-200;
+  }
+  .google-btn [role='button'] span {
+    @apply text-sm font-medium text-gray-700;
+    font-family: inherit;
+    letter-spacing: normal;
+  }
+
+  /* Divider with a centered label, e.g. "or continue with" */
+  .divider {
+    @apply flex items-center gap-3 text-xs font-medium uppercase tracking-wide text-gray-400;
+  }
+  .divider::before,
+  .divider::after {
+    @apply h-px flex-1 bg-gray-200;
+    content: '';
+  }
+
   /* Form controls */
   .input-field {
     @apply w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900

@@ -9,7 +9,8 @@ namespace ChatApp.Application.Mappings
         public void Register(TypeAdapterConfig config)
         {
             config.NewConfig<AppUser, UserDto>()
-                .Map(dest => dest.Username, src => src.UserName);
+                .Map(dest => dest.Username, src => src.UserName)
+                .Map(dest => dest.HasPassword, src => src.PasswordHash != null);
         }
     }
 }

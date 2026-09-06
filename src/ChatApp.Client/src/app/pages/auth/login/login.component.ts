@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, viewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthActions } from '@store/auth';
+import { GoogleIdentityService } from '@core/services';
 import { LoginForm } from '../auth.models';
 import { LucideUser, LucideLock, LucideMessageCircle } from '@lucide/angular';
 import { TextFieldComponent } from '@shared/components';
@@ -17,13 +18,21 @@ import { TextFieldComponent } from '@shared/components';
   ],
   templateUrl: './login.component.html'
 })
-export class LoginComponent {
+export class LoginComponent implements AfterViewInit {
   form = new FormGroup({
     usernameOrEmail: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
   });
 
+  private readonly googleBtn = viewChild.required<ElementRef<HTMLDivElement>>('googleBtn');
   private readonly store = inject(Store);
+  private readonly googleIdentityService = inject(GoogleIdentityService);
+
+  ngAfterViewInit(): void {
+    const host = this.googleBtn().nativeElement;
+
+    this.googleIdentityService.renderButton(host, Math.min(400, Math.max(200, host.clientWidth)));
+  }
 
   onSubmit(): void {
     if (this.form.invalid) {

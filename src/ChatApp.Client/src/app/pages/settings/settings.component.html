@@ -65,57 +65,60 @@
         </div>
 
         <!-- Password section -->
-        <div class="auth-card">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Change password</h2>
+        @if (currentUser()?.hasPassword ?? false)
+        {
+            <div class="auth-card">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Change password</h2>
 
-            <form class="space-y-5" [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
-                <div>
-                    <app-text-field
-                        label="Current password"
-                        id="currentPassword"
-                        type="password"
-                        formControlName="currentPassword"
-                        autocomplete="current-password"
-                        placeholder="••••••••"
-                    >
-                        <svg lucideLock icon class="w-4 h-4"></svg>
-                    </app-text-field>
-                </div>
-                <div>
-                    <app-text-field
-                        label="New password"
-                        id="newPassword"
-                        type="password"
-                        formControlName="newPassword"
-                        autocomplete="new-password"
-                        placeholder="••••••••"
-                    >
-                        <svg lucideLock icon class="w-4 h-4"></svg>
-                    </app-text-field>
-                </div>
-                <div>
-                    <app-text-field
-                        label="Confirm new password"
-                        id="confirmPassword"
-                        type="password"
-                        formControlName="confirmPassword"
-                        autocomplete="new-password"
-                        placeholder="••••••••"
-                    >
-                        <svg lucideLock icon class="w-4 h-4"></svg>
-                    </app-text-field>
-                </div>
-
-                <button type="submit" class="btn-primary w-full">
-                    Change password
-                </button>
-
-                @if (passwordMessage) {
-                    <div [class]="passwordMessageType() === 'error' ? 'alert-error' : 'alert-success'" class="text-left">
-                        <span>{{ passwordMessage }}</span>
+                <form class="space-y-5" [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+                    <div>
+                        <app-text-field
+                            label="Current password"
+                            id="currentPassword"
+                            type="password"
+                            formControlName="currentPassword"
+                            autocomplete="current-password"
+                            placeholder="••••••••"
+                        >
+                            <svg lucideLock icon class="w-4 h-4"></svg>
+                        </app-text-field>
                     </div>
-                }
-            </form>
-        </div>
+                    <div>
+                        <app-text-field
+                            label="New password"
+                            id="newPassword"
+                            type="password"
+                            formControlName="newPassword"
+                            autocomplete="new-password"
+                            placeholder="••••••••"
+                        >
+                            <svg lucideLock icon class="w-4 h-4"></svg>
+                        </app-text-field>
+                    </div>
+                    <div>
+                        <app-text-field
+                            label="Confirm new password"
+                            id="confirmPassword"
+                            type="password"
+                            formControlName="confirmPassword"
+                            autocomplete="new-password"
+                            placeholder="••••••••"
+                        >
+                            <svg lucideLock icon class="w-4 h-4"></svg>
+                        </app-text-field>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full">
+                        Change password
+                    </button>
+
+                    @if (passwordMessage) {
+                        <div [class]="passwordMessageType() === 'error' ? 'alert-error' : 'alert-success'" class="text-left">
+                            <span>{{ passwordMessage }}</span>
+                        </div>
+                    }
+                </form>
+            </div>
+        }
     </div>
 </section>
