@@ -7,7 +7,7 @@
     "build": "npm run build:dev",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "start:dev": "ng serve --c=development --host 0.0.0.0",
+    "start:dev": "ng serve --c=development --host 0.0.0.0 --open",
     "build:dev": "ng build --c=development",
     "start:prod": "ng serve --c=production",
     "build:prod": "ng build --c=production"

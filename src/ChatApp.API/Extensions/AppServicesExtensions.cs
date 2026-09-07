@@ -1,12 +1,14 @@
 ﻿using Asp.Versioning;
-using Microsoft.Extensions.Options;
+using ChatApp.API.Jobs;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.OpenApi.Models;
 
 namespace ChatApp.API.Extensions
 {
     public static class AppServicesExtensions
     {
-        public static IServiceCollection AddAppServices(this IServiceCollection services)
+        public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration config)
         {
             // CORS
             services.AddCors(options =>
@@ -52,6 +54,18 @@ namespace ChatApp.API.Extensions
                 options.AddSecurityDefinition("Bearer", jwtScheme);
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement { { jwtScheme, Array.Empty<string>() } });
             });
+
+            // Hangfire
+            services.AddHangfire(configuration => configuration
+               .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+               .UseSimpleAssemblyNameTypeSerializer()
+               .UseRecommendedSerializerSettings()
+               .UsePostgreSqlStorage(c => c.UseNpgsqlConnection(config.GetConnectionString("Default"))));
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer();
+
+            services.AddScoped<EmailNotificationForUnreadMessagesJob>();
 
             return services;
         }

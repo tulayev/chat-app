@@ -30,7 +30,6 @@ namespace ChatApp.Infrastructure
             // Redis
             services.AddSingleton<IConnectionMultiplexer>(sp =>
             {
-                var config = sp.GetRequiredService<IConfiguration>();
                 var redisHost = config["Redis:Host"] ?? "localhost";
                 var redisPort = config["Redis:Port"] ?? "6379";
 

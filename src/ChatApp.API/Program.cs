@@ -1,9 +1,9 @@
-using Asp.Versioning.ApiExplorer;
 using ChatApp.API.Extensions;
 using ChatApp.API.Middlewares;
 using ChatApp.Application;
 using ChatApp.Application.Hubs;
 using ChatApp.Infrastructure;
+using Hangfire;
 using NLog;
 
 try 
@@ -17,9 +17,13 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddInfrastructure(builder.Configuration)
         .AddApplication();
-    builder.Services.AddAppServices();
+    builder.Services.AddAppServices(builder.Configuration);
 
-    var app = await builder.Build().MigrateDatabaseAsync();
+    var app = builder.Build();
+
+    await app.MigrateDatabaseAsync();
+
+    app.ScheduleHangfireJobs();
 
     if (app.Environment.IsDevelopment())
     {
@@ -38,6 +42,7 @@ try
     app.UseCors("Cors");
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseHangfireDashboard("/hangfire");
     app.MapControllers();
     app.MapHub<ChatHub>("hubs/chat").RequireAuthorization();
 
