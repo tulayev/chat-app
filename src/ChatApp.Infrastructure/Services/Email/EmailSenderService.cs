@@ -1,5 +1,9 @@
 ﻿using ChatApp.Application.Common.Interfaces.Email;
+using ChatApp.Infrastructure.Resilience;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Polly;
+using Polly.Registry;
 using System.Net;
 using System.Net.Mail;
 
@@ -17,10 +21,16 @@ namespace ChatApp.Infrastructure.Services.Email
     public class EmailSenderService : IEmailSenderService
     {
         private readonly SmtpSettings _settings;
+        private readonly ResiliencePipeline _pipeline;
+        private readonly ILogger<EmailSenderService> _logger;
 
-        public EmailSenderService(IConfiguration config)
+        public EmailSenderService(IConfiguration config, 
+            ResiliencePipelineProvider<string> pipelineProvider, 
+            ILogger<EmailSenderService> logger)
         {
             _settings = config.GetSection("Email:Smtp").Get<SmtpSettings>()!;
+            _pipeline = pipelineProvider.GetPipeline(ResiliencePipelineKeys.SmtpEmail);
+            _logger = logger;
         }
 
         public async Task SendAsync(string to, string subject, string body)
@@ -36,7 +46,9 @@ namespace ChatApp.Infrastructure.Services.Email
                 IsBodyHtml = true
             };
 
-            await client.SendMailAsync(message);
+            await _pipeline.ExecuteAsync(async ct => await client.SendMailAsync(message, ct));
+
+            _logger.LogInformation("Email sent to '{To}'", to);
         }
     }
 }

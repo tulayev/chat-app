@@ -2,14 +2,45 @@
 using ChatApp.API.Jobs;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
+using System.Threading.RateLimiting;
 
 namespace ChatApp.API.Extensions
 {
     public static class AppServicesExtensions
     {
+        public const string AuthRateLimiterPolicy = "auth";
+        public const string VerificationRateLimiterPolicy = "verification";
+
         public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration config)
         {
+            // Rate limiting
+            services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                options.AddPolicy(AuthRateLimiterPolicy, httpContext =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0
+                        }));
+
+                options.AddPolicy(VerificationRateLimiterPolicy, httpContext =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 3,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0
+                        }));
+            });
+
             // CORS
             services.AddCors(options =>
             {

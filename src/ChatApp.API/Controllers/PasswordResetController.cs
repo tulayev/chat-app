@@ -1,9 +1,12 @@
+using ChatApp.API.Extensions;
 using ChatApp.Application.CQRS.PasswordReset.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ChatApp.API.Controllers
 {
+    [EnableRateLimiting(AppServicesExtensions.VerificationRateLimiterPolicy)]
     public class PasswordResetController : BaseApiController
     {
         private readonly IMediator _mediator;

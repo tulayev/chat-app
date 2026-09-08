@@ -5,9 +5,13 @@ A real-time chat application with a .NET 8+ backend built on **Clean Architectur
 ## Features
 
 - User registration, login, and email verification
-- JWT-based authentication (also supported over SignalR via query-string token)
+- JWT-based authentication (also supported over SignalR via query-string token), plus Google Sign-In (OIDC ID token verification)
+- Password reset via emailed verification code (backed by Redis)
+- Profile management (avatar/username updates) via Cloudinary
 - Real-time messaging through a SignalR hub — REST writes fan out to connected clients in the same request
-- Avatar/image uploads via Cloudinary
+- Read receipts for chat messages
+- Background email digest for unread messages (daily Hangfire job)
+- Resilience: Polly retry/timeout pipelines around Redis and SMTP calls, rate limiting on anonymous auth endpoints and on the background email job
 - Dockerized full stack: API, client, PostgreSQL, and Redis
 
 ## Tech Stack
@@ -16,9 +20,11 @@ A real-time chat application with a .NET 8+ backend built on **Clean Architectur
 - .NET 8+, ASP.NET Core Web API, SignalR
 - Clean Architecture (Domain / Application / Infrastructure / API)
 - MediatR (CQRS), FluentValidation, Mapster
-- EF Core + PostgreSQL, ASP.NET Identity Core
-- Redis
+- EF Core + PostgreSQL (with `EnableRetryOnFailure`), ASP.NET Identity Core
+- Redis (verification codes), Google.Apis.Auth (Google Sign-In via OIDC ID token verification)
 - Cloudinary (image storage), SMTP (email)
+- Hangfire (scheduled background jobs)
+- Polly (retry/timeout/rate-limit pipelines), ASP.NET Core rate limiting middleware
 
 **Frontend**
 - Angular 20 (standalone components)
@@ -44,7 +50,7 @@ docker compose up --build
 ```
 
 This brings up:
-- `api` — http://localhost:5000
+- `api` — http://localhost:5000 (Hangfire dashboard at `/hangfire`)
 - `client` — http://localhost:4200
 - `postgres:17` — 5432
 - `redis:7.2` — 6379

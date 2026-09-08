@@ -1,4 +1,5 @@
-﻿using ChatApp.Application.Common.Extensions;
+﻿using ChatApp.API.Extensions;
+using ChatApp.Application.Common.Extensions;
 using ChatApp.Application.CQRS.Login.Commands;
 using ChatApp.Application.CQRS.Login.Queries;
 using ChatApp.Application.CQRS.PasswordReset.Commands;
@@ -8,6 +9,7 @@ using ChatApp.Application.DTOs.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ChatApp.API.Controllers
 {
@@ -22,6 +24,7 @@ namespace ChatApp.API.Controllers
 
         [HttpPost("register")]
         [Consumes("multipart/form-data")]
+        [EnableRateLimiting(AppServicesExtensions.AuthRateLimiterPolicy)]
         public async Task<ActionResult<string>> Register([FromForm] RegisterRequestDto request)
         {
             var response = await _mediator.Send(new RegisterUserCommand(request));
@@ -29,13 +32,15 @@ namespace ChatApp.API.Controllers
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting(AppServicesExtensions.AuthRateLimiterPolicy)]
         public async Task<ActionResult<string>> Login([FromBody] LoginRequestDto request)
         {
             var response = await _mediator.Send(new LoginUserQuery(request));
             return HandleResponse(response);
         }
-        
+
         [HttpPost("google")]
+        [EnableRateLimiting(AppServicesExtensions.AuthRateLimiterPolicy)]
         public async Task<ActionResult<string>> Google([FromBody] GoogleLoginRequestDto request)
         {
             var response = await _mediator.Send(new GoogleLoginCommand(request));

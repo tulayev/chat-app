@@ -42,6 +42,7 @@ try
     app.UseCors("Cors");
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseRateLimiter();
     app.UseHangfireDashboard("/hangfire");
     app.MapControllers();
     app.MapHub<ChatHub>("hubs/chat").RequireAuthorization();

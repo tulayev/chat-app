@@ -1,5 +1,8 @@
 using ChatApp.Application.Common.Enums;
 using ChatApp.Application.Common.Interfaces.Security;
+using ChatApp.Infrastructure.Resilience;
+using Polly;
+using Polly.Registry;
 using StackExchange.Redis;
 
 namespace ChatApp.Infrastructure.Services.Security
@@ -7,26 +10,32 @@ namespace ChatApp.Infrastructure.Services.Security
     public class VerificationCodeService : IVerificationCodeService
     {
         private readonly IDatabase _db;
+        private readonly ResiliencePipeline _pipeline;
 
-        public VerificationCodeService(IConnectionMultiplexer redis)
+        public VerificationCodeService(IConnectionMultiplexer redis, 
+            ResiliencePipelineProvider<string> pipelineProvider)
         {
             _db = redis.GetDatabase();
+            _pipeline = pipelineProvider.GetPipeline(ResiliencePipelineKeys.RedisVerificationCode);
         }
 
         public async Task StoreCodeAsync(string email, string code, TimeSpan lifetime, VerificationPurpose purpose = VerificationPurpose.EmailVerification)
         {
-            await _db.StringSetAsync(NormalizeKey(email, purpose), code, lifetime);
+            await _pipeline.ExecuteAsync(async ct =>
+                await _db.StringSetAsync(NormalizeKey(email, purpose), code, lifetime));
         }
 
         public async Task<string?> GetCodeAsync(string email, VerificationPurpose purpose = VerificationPurpose.EmailVerification)
         {
-            var value = await _db.StringGetAsync(NormalizeKey(email, purpose));
+            var value = await _pipeline.ExecuteAsync(async ct =>
+                await _db.StringGetAsync(NormalizeKey(email, purpose)));
             return value.HasValue ? value.ToString() : null;
         }
 
         public async Task DeleteCodeAsync(string email, VerificationPurpose purpose = VerificationPurpose.EmailVerification)
         {
-            await _db.KeyDeleteAsync(NormalizeKey(email, purpose));
+            await _pipeline.ExecuteAsync(async ct =>
+                await _db.KeyDeleteAsync(NormalizeKey(email, purpose)));
         }
 
         private static string NormalizeKey(string email, VerificationPurpose purpose)

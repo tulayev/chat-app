@@ -1,8 +1,11 @@
 using ChatApp.Application.Common.Interfaces.Email;
 using ChatApp.Application.Common.Interfaces.Repositories;
 using ChatApp.Domain.Models;
+using ChatApp.Infrastructure.Resilience;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using Polly;
+using Polly.Registry;
 
 namespace ChatApp.API.Jobs
 {
@@ -11,14 +14,17 @@ namespace ChatApp.API.Jobs
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEmailSenderService _emailSenderService;
         private readonly ILogger<EmailNotificationForUnreadMessagesJob> _logger;
+        private readonly ResiliencePipeline _throttlePipeline;
 
         public EmailNotificationForUnreadMessagesJob(IUnitOfWork unitOfWork,
             IEmailSenderService emailSenderService,
-            ILogger<EmailNotificationForUnreadMessagesJob> logger)
+            ILogger<EmailNotificationForUnreadMessagesJob> logger,
+            ResiliencePipelineProvider<string> pipelineProvider)
         {
             _unitOfWork = unitOfWork;
             _emailSenderService = emailSenderService;
             _logger = logger;
+            _throttlePipeline = pipelineProvider.GetPipeline(ResiliencePipelineKeys.UnreadMessagesEmailThrottle);
         }
 
         [DisableConcurrentExecution(timeoutInSeconds: 60)]
@@ -52,6 +58,7 @@ namespace ChatApp.API.Jobs
                 .ToList();
 
             var recipientIds = unreadByRecipient.Select(x => x.RecipientId).ToHashSet();
+
             var recipients = await _unitOfWork.GetQueryable<AppUser>()
                 .Where(u => recipientIds.Contains(u.Id) && u.EmailConfirmed && u.Email != null)
                 .Select(u => new { u.Id, u.Email, u.UserName })
@@ -72,7 +79,8 @@ namespace ChatApp.API.Jobs
 
                 try
                 {
-                    await _emailSenderService.SendAsync(recipient.Email!, subject, body);
+                    await _throttlePipeline.ExecuteAsync(async _ =>
+                        await _emailSenderService.SendAsync(recipient.Email!, subject, body), ct);
                     sent++;
                 }
                 catch (Exception ex)
